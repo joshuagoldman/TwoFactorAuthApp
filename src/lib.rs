@@ -50,6 +50,7 @@ pub fn App(cx: Scope) -> impl IntoView {
                   user_info.update(|i| *i = Some(info));
               }
               Err(err) => {
+                  authorized_api.update(|a| *a = None);
                   token_has_been_verified.update(|a| *a = true);
                   LocalStorage::delete(API_TOKEN_STORAGE_KEY);
                   log::error!("Unable to fetch user info: {err}")
@@ -57,6 +58,7 @@ pub fn App(cx: Scope) -> impl IntoView {
             }
           }
           else {
+            authorized_api.update(|a| *a = None);
             token_has_been_verified.update(|a| *a = true);
             LocalStorage::delete(API_TOKEN_STORAGE_KEY);
             log::error!("Token has expired!")
