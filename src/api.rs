@@ -30,14 +30,16 @@ impl UnauthorizedApi {
         let response = Request::post(&url).json(credentials)?.send().await?;
         into_json(response).await
     }
-    pub async fn login(
-        &self,
-        credentials: &Credentials,
-    ) -> Result<OtpAuthorizedApi> {
+    pub async fn login(&self, credentials: &Credentials) -> Result<OtpAuthorizedApi> {
         let url = format!("{}/login", self.url);
         let response = Request::post(&url).json(credentials)?.send().await?;
         let login_resp: TokenResponse = into_json(response).await?;
-        Ok(OtpAuthorizedApi::new(self.url, ApiToken { token: login_resp.token } ))
+        Ok(OtpAuthorizedApi::new(
+            self.url,
+            ApiToken {
+                token: login_resp.token,
+            },
+        ))
     }
 }
 
@@ -45,13 +47,15 @@ impl OtpAuthorizedApi {
     pub const fn new(url: &'static str, token: ApiToken) -> Self {
         Self { url, token }
     }
-    pub async fn check_otp(
-        &self,
-        otp: &String,
-    ) -> Result<AuthorizedApi> {
+    pub async fn check_otp(&self, otp: &String) -> Result<AuthorizedApi> {
         let url = format!("{}/verifyotp/{}", self.url, otp);
         let otp_resp: TokenResponse = self.send(Request::get(&url)).await?;
-        Ok(AuthorizedApi::new(self.url, ApiToken { token: otp_resp.token } ))
+        Ok(AuthorizedApi::new(
+            self.url,
+            ApiToken {
+                token: otp_resp.token,
+            },
+        ))
     }
     async fn send<T>(&self, req: Request) -> Result<T>
     where

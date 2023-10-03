@@ -4,22 +4,20 @@ use crate::pages::Page;
 
 #[component]
 pub fn CredentialsForm(
-    cx: Scope,
     action: Action<(String, String), ()>,
     error: Signal<Option<String>>,
     disabled: Signal<bool>,
 ) -> impl IntoView {
-    let (password, set_password) = create_signal(cx, String::new());
-    let (username, set_username) = create_signal(cx, String::new());
+    let (password, set_password) = create_signal(String::new());
+    let (username, set_username) = create_signal(String::new());
 
-    let dispatch_action =
-        move || action.dispatch((username.get(), password.get()));
+    let dispatch_action = move || action.dispatch((username.get(), password.get()));
 
-    let button_is_disabled = Signal::derive(cx, move || {
+    let button_is_disabled = Signal::derive(move || {
         disabled.get() || password.get().is_empty() || username.get().is_empty()
     });
 
-    view! { cx,
+    view! {
       <div class="container">
         <div class="d-flex justify-content-center h-100">
           <div class="card">
@@ -37,8 +35,8 @@ pub fn CredentialsForm(
                   <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                   </div>
-                  <input type="text" 
-                         class="form-control" 
+                  <input type="text"
+                         class="form-control"
                          placeholder="username"
                          prop:disabled = move || disabled.get()
                          on:keyup = move |ev: ev::KeyboardEvent| {
@@ -50,7 +48,7 @@ pub fn CredentialsForm(
                            let val = event_target_value(&ev);
                            set_username.update(|v|*v = val);
                          }/>
-                  
+
                 </div>
                 <div class="input-group form-group">
                   <div class="input-group-prepend">
@@ -78,18 +76,18 @@ pub fn CredentialsForm(
                     }/>
                 </div>
                 <div class="form-group">
-                  <input type="submit" 
-                         value="Login" 
+                  <input type="submit"
+                         value="Login"
                          class="btn float-right login_btn"
                          prop:disabled = move || button_is_disabled.get()
-                         
+
                          on:click = move |_| dispatch_action()/>
                 </div>
               </form>
             </div>
             <div class="card-footer">
               <div>
-                {move || error.get().map(|err| view!{ cx,
+                {move || error.get().map(|err| view!{
                   <p style ="color:red;" >{ err }</p>
                 })}
               </div>

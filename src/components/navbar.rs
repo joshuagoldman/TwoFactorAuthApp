@@ -1,19 +1,15 @@
 use leptos::*;
 
 #[component]
-pub fn NavBar<F>(
-    cx: Scope,
-    logged_in: Signal<bool>,
-    on_logout: F,
-) -> impl IntoView
+pub fn NavBar<F>(logged_in: Signal<bool>, on_logout: F) -> impl IntoView
 where
     F: Fn() + 'static + Clone,
 {
-    view! { cx,
+    view! {
       <nav>
         <Show
           when = move || logged_in.get()
-          fallback = |cx| view! { cx,
+          fallback = || view! {
             <div/>
           }
         >
