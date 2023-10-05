@@ -3,64 +3,62 @@ use leptos::*;
 
 #[component]
 pub fn RegisterForm(
-    cx: Scope,
     action: Action<NewUser, ()>,
     error: Signal<Option<String>>,
     disabled: Signal<bool>,
 ) -> impl IntoView {
-    let (password, set_password) = create_signal(cx, String::new());
-    let (password_again, set_password_again) = create_signal(cx, String::new());
-    let (username, set_username) = create_signal(cx, String::new());
-    let (email, set_email) = create_signal(cx, String::new());
-    let (full_name, set_full_name) = create_signal(cx, String::new());
+    let (password, set_password) = create_signal(String::new());
+    let (password_again, set_password_again) = create_signal(String::new());
+    let (username, set_username) = create_signal(String::new());
+    let (email, set_email) = create_signal(String::new());
+    let (full_name, set_full_name) = create_signal(String::new());
 
-    let dispatch_action =
-        move || action.dispatch(
-          NewUser {
+    let dispatch_action = move || {
+        action.dispatch(NewUser {
             username: username.get(),
             password: password.get(),
             email: email.get(),
-            full_name: full_name.get()
-          });
+            full_name: full_name.get(),
+        })
+    };
 
-    let button_is_disabled = Signal::derive(cx, move || {
-        let all_one_empty = 
-          disabled.get() || password.get().is_empty() || email.get().is_empty() ||
-          username.get().is_empty() || full_name.get().is_empty() || password_again.get().is_empty();
+    let button_is_disabled = Signal::derive(move || {
+        let all_one_empty = disabled.get()
+            || password.get().is_empty()
+            || email.get().is_empty()
+            || username.get().is_empty()
+            || full_name.get().is_empty()
+            || password_again.get().is_empty();
 
-        let passwords_are_equal =
-          match (password.get().is_empty(),password_again.get().is_empty()) {
-            (true,true) => false,
-            (_,_) => {
-              password.get() == password_again.get()
-            }
-          };
+        let passwords_are_equal = match (password.get().is_empty(), password_again.get().is_empty())
+        {
+            (true, true) => false,
+            (_, _) => password.get() == password_again.get(),
+        };
 
-          all_one_empty || !passwords_are_equal
+        all_one_empty || !passwords_are_equal
     });
 
     let on_change_closure = move |set_signal: WriteSignal<String>| {
-      move |ev| {
-        let val = event_target_value(&ev);
-        set_signal.update(|v|*v = val);
-      }
-    } ;
+        move |ev| {
+            let val = event_target_value(&ev);
+            set_signal.update(|v| *v = val);
+        }
+    };
 
-    let on_key_up_closure = move |set_signal: WriteSignal<String> | {
-      move |ev: ev::KeyboardEvent| {
-        match (&*ev.key(),button_is_disabled.get()) {
-            ("Enter",false) => {
-              dispatch_action();
+    let on_key_up_closure = move |set_signal: WriteSignal<String>| {
+        move |ev: ev::KeyboardEvent| match (&*ev.key(), button_is_disabled.get()) {
+            ("Enter", false) => {
+                dispatch_action();
             }
-            (_,_) => {
-              let val = event_target_value(&ev);
-              set_signal.update(|p|*p = val);
+            (_, _) => {
+                let val = event_target_value(&ev);
+                set_signal.update(|p| *p = val);
             }
         }
-      }
-    } ;
+    };
 
-    view!{cx,
+    view! {
       <div class="container register-form">
             <div class="form">
                 <div class="note">
@@ -119,7 +117,7 @@ pub fn RegisterForm(
                             </div>
                         </div>
                     </div>
-                    {move || error.get().map(|err| view!{ cx,
+                    {move || error.get().map(|err| view!{
                       <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                         <p style ="color:white;" >{ err }</p>
                       </div>
@@ -136,26 +134,27 @@ pub fn RegisterForm(
 }
 
 #[component]
-fn RegisterInput<F,G>(cx: Scope,
-                    on_change: F,
-                    on_key_up: G,
-                    disabled: Signal<bool>,
-                    place_holder: String,
-                    input_type: String) -> impl IntoView
-where 
+fn RegisterInput<F, G>(
+    on_change: F,
+    on_key_up: G,
+    disabled: Signal<bool>,
+    place_holder: String,
+    input_type: String,
+) -> impl IntoView
+where
     F: FnMut(web_sys::Event) + 'static + Clone,
     G: FnMut(ev::KeyboardEvent) + 'static + Clone,
 {
-  view! {cx,
-    <input
-      class="form-control"
-      type = input_type
-      required
-      placeholder = place_holder
-      prop:disabled = move || disabled.get()
-      on:keyup = on_key_up
-      // The `change` event fires when the browser fills the form automatically,
-      on:change = on_change
-    />
-  }
+    view! {
+      <input
+        class="form-control"
+        type = input_type
+        required
+        placeholder = place_holder
+        prop:disabled = move || disabled.get()
+        on:keyup = on_key_up
+        // The `change` event fires when the browser fills the form automatically,
+        on:change = on_change
+      />
+    }
 }

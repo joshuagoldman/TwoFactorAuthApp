@@ -1,32 +1,28 @@
 use std::time::Duration;
 
+use crate::pages::Page;
+use crate::API_TOKEN_OTP_KEY;
+use crate::{api, components::otp_form::OtpForm};
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::*;
 use leptos_router::use_navigate;
-use crate::API_TOKEN_OTP_KEY;
-use crate::pages::Page;
-use crate::{api, components::otp_form::OtpForm};
 
-use crate::{
-    api::OtpAuthorizedApi, api::AuthorizedApi,
-};
-
-use crate::otp_form::OtpFormProps;
+use crate::{api::AuthorizedApi, api::OtpAuthorizedApi};
 
 #[component]
-pub fn Otp<F>(cx: Scope, 
-           otp_api_signal: RwSignal<Option<OtpAuthorizedApi>>,
-           opt_verify_success_action: F) -> impl IntoView
+pub fn Otp<F>(
+    otp_api_signal: RwSignal<Option<OtpAuthorizedApi>>,
+    opt_verify_success_action: F,
+) -> impl IntoView
 where
-    F: Fn(AuthorizedApi) + 'static + Clone
+    F: Fn(AuthorizedApi) + 'static + Clone,
 {
-    let (is_sending_otp, set_is_sending_otp) = create_signal(cx, false);
-    let (failed_otp_error, set_otp_error) = create_signal(cx, None::<String>);
-    
-    let send_otp_action = 
-        create_action(cx, move |(otp_api_val_ref,otp_str) : &(OtpAuthorizedApi,String)| {
-            log!("Try to verify OTP {}", otp_str);
+    let (is_sending_otp, set_is_sending_otp) = create_signal(false);
+    let (failed_otp_error, set_otp_error) = create_signal(None::<String>);
+
+    let send_otp_action = create_action(
+        move |(otp_api_val_ref, otp_str): &(OtpAuthorizedApi, String)| {
             let otp_str = otp_str.clone();
             let otp_api_val = otp_api_val_ref.clone();
             let opt_verify_success_action = opt_verify_success_action.clone();
@@ -46,23 +42,22 @@ where
                             }
                             api::Error::Api(err) => err.message,
                         };
-                        log::warn!(
-                            "OTP Validation failed: {msg}"
-                        );
+                        log::warn!("OTP Validation failed: {msg}");
                         LocalStorage::delete(API_TOKEN_OTP_KEY);
                         set_otp_error.update(|e| *e = Some(msg));
                     }
                 }
             }
-        });
+        },
+    );
 
-    view! { cx,
+    view! {
         {move || match otp_api_signal.get() {
-                Some(otp_api) => {       
-                    view! { cx,
+                Some(otp_api) => {
+                    view! {
                         <Show
                         when = move || failed_otp_error.get().is_some()
-                        fallback = move |_| view!{ cx,
+                        fallback = move || view!{
                             <OtpForm
                                 send_otp=send_otp_action
                                 api=otp_api.clone()
@@ -74,18 +69,18 @@ where
                                 {failed_otp_error.get().unwrap()}
                             </div>
                         </Show>
-                    }.into_view(cx)
+                    }.into_view()
                 },
                 None => {
                     {
                         move || {
-                            let navigate = use_navigate(cx);
-                            navigate(Page::Login.path(), Default::default()).expect("Login route");
-                            view!{ cx,
+                            let navigate = use_navigate();
+                            navigate(Page::Login.path(), Default::default());
+                            view!{
                                 <div/>
                             }
                         }
-                    }.into_view(cx)
+                    }.into_view()
                 }
             }
         }

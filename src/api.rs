@@ -1,4 +1,4 @@
-use gloo_net::http::{Request, Response};
+use gloo_net::http::{Request, RequestBuilder, Response};
 use serde::de::DeserializeOwned;
 use thiserror::Error;
 
@@ -57,7 +57,7 @@ impl OtpAuthorizedApi {
             },
         ))
     }
-    async fn send<T>(&self, req: Request) -> Result<T>
+    async fn send<T>(&self, req: RequestBuilder) -> Result<T>
     where
         T: DeserializeOwned,
     {
@@ -79,7 +79,7 @@ impl AuthorizedApi {
     fn auth_header_value(&self) -> String {
         format!("Bearer {}", self.token.token)
     }
-    async fn send<T>(&self, req: Request) -> Result<T>
+    async fn send<T>(&self, req: RequestBuilder) -> Result<T>
     where
         T: DeserializeOwned,
     {
