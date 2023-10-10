@@ -43,7 +43,7 @@ where
                             api::Error::Api(err) => err.message,
                         };
                         log::warn!("OTP Validation failed: {msg}");
-                        LocalStorage::delete(API_TOKEN_OTP_KEY);
+                        LocalStorage::delete(API_TOKEN_OTP_KEY.as_str());
                         set_otp_error.update(|e| *e = Some(msg));
                     }
                 }

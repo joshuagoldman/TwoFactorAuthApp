@@ -9,12 +9,24 @@ mod components;
 mod pages;
 
 use crate::api::AuthorizedApi;
+use lazy_static::lazy_static;
 
 use self::{components::*, pages::*};
 
-const DEFAULT_API_URL: &str = "http://localhost:3000";
-const API_TOKEN_STORAGE_KEY: &str = "api-token";
-const API_TOKEN_OTP_KEY: &str = "api-token-otp";
+lazy_static! {
+    static ref DEFAULT_API_URL: String =
+        std::env::var("DEFAULT_API_URL").expect("DEFAULT_API_URL is expected!");
+}
+
+lazy_static! {
+    static ref API_TOKEN_STORAGE_KEY: String =
+        std::env::var("API_TOKEN_STORAGE_KEY").expect("API_TOKEN_STORAGE_KEY is expected!");
+}
+
+lazy_static! {
+    static ref API_TOKEN_OTP_KEY: String =
+        std::env::var("API_TOKEN_OTP_KEY").expect("API_TOKEN_OTP_KEY is expected!");
+}
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -46,21 +58,21 @@ pub fn App() -> impl IntoView {
                 match api.user_info().await {
                     Ok(info) => {
                         async_std::task::sleep(std::time::Duration::new(1, 0)).await;
-                        LocalStorage::delete(API_TOKEN_OTP_KEY);
+                        LocalStorage::delete(API_TOKEN_OTP_KEY.as_str());
                         otp_authorized_api.update(|x| *x = None);
                         user_info.update(|i| *i = Some(info));
                     }
                     Err(err) => {
                         authorized_api.update(|a| *a = None);
                         token_has_been_verified.update(|a| *a = true);
-                        LocalStorage::delete(API_TOKEN_STORAGE_KEY);
+                        LocalStorage::delete(API_TOKEN_STORAGE_KEY.as_str());
                         log::error!("Unable to fetch user info: {err}")
                     }
                 }
             } else {
                 authorized_api.update(|a| *a = None);
                 token_has_been_verified.update(|a| *a = true);
-                LocalStorage::delete(API_TOKEN_STORAGE_KEY);
+                LocalStorage::delete(API_TOKEN_STORAGE_KEY.as_str());
                 log::error!("Token has expired!")
             }
         }
@@ -69,7 +81,8 @@ pub fn App() -> impl IntoView {
     let set_opt_token_into_local_storage = create_action(move |_| async move {
         match otp_authorized_api.get() {
             Some(api) => {
-                LocalStorage::set(API_TOKEN_OTP_KEY, api.token).expect("LocalStorage::set");
+                LocalStorage::set(API_TOKEN_OTP_KEY.as_str(), api.token)
+                    .expect("LocalStorage::set");
             }
             None => {
                 log::error!(
@@ -81,16 +94,16 @@ pub fn App() -> impl IntoView {
 
     // -- init API -- //
 
-    let unauthorized_api = api::UnauthorizedApi::new(DEFAULT_API_URL);
-    if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY) {
-        let api = api::AuthorizedApi::new(DEFAULT_API_URL, token);
+    let unauthorized_api = api::UnauthorizedApi::new(DEFAULT_API_URL.as_str());
+    if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.as_str()) {
+        let api = api::AuthorizedApi::new(DEFAULT_API_URL.as_str(), token);
         fetch_user_info.dispatch(api);
     } else {
         token_has_been_verified.update(|a| *a = true);
     }
 
-    if let Ok(token) = LocalStorage::get(API_TOKEN_OTP_KEY) {
-        let api = api::OtpAuthorizedApi::new(DEFAULT_API_URL, token);
+    if let Ok(token) = LocalStorage::get(API_TOKEN_OTP_KEY.as_str()) {
+        let api = api::OtpAuthorizedApi::new(DEFAULT_API_URL.as_str(), token);
         otp_authorized_api.update(|a| *a = Some(api));
     }
 
@@ -102,7 +115,7 @@ pub fn App() -> impl IntoView {
                 on_logout = move || {
                     let navigate = use_navigate();
                     navigate(Page::Login.path(), Default::default());
-                    LocalStorage::delete(API_TOKEN_STORAGE_KEY);
+                    LocalStorage::delete(API_TOKEN_STORAGE_KEY.as_str());
                     authorized_api.update(|a| *a = None);
                     user_info.update(|a| *a = None);
                 }/>
@@ -148,7 +161,7 @@ pub fn App() -> impl IntoView {
                     opt_verify_success_action=move |api: api::AuthorizedApi| {
                         log::info!("Authentication successfully performed!");
                         authorized_api.update(|x| *x = Some(api.clone()));
-                        LocalStorage::set(API_TOKEN_STORAGE_KEY, api.clone().token).expect("LocalStorage::set");
+                        LocalStorage::set(API_TOKEN_STORAGE_KEY.as_str(), api.clone().token).expect("LocalStorage::set");
                         let navigate = use_navigate();
                         navigate(Page::Home.path(), Default::default());
                         fetch_user_info.dispatch(api);
