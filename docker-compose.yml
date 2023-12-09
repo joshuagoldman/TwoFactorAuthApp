@@ -1,0 +1,11 @@
+version: '3.6'
+services:
+  frontend:
+    image: joshuagoldman1994/auth2fa-app:1.0.0-t30
+    build: 
+      context: .
+      dockerfile: ./prebuild.dockerfile
+      args:
+        DEFAULT_API_URL: /Backend
+        API_TOKEN_STORAGE_KEY: api-token
+        API_TOKEN_OTP_KEY: api-token-otp

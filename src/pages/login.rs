@@ -8,6 +8,7 @@ use api_boundary::*;
 use crate::{
     api::{self, OtpAuthorizedApi, UnauthorizedApi},
     components::credentials::*,
+    DEFAULT_API_URL,
 };
 
 #[component]
@@ -20,6 +21,7 @@ where
 
     let login_action = create_action(move |(username, password): &(String, String)| {
         log::debug!("Try to login with {username}");
+        log::debug!("using at url: {}", DEFAULT_API_URL.to_string());
         let username = username.to_string();
         let password = password.to_string();
         let credentials = Credentials { username, password };

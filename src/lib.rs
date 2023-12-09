@@ -8,24 +8,23 @@ mod api;
 mod components;
 mod pages;
 
+use self::{components::*, pages::*};
 use crate::api::AuthorizedApi;
 use lazy_static::lazy_static;
 
-use self::{components::*, pages::*};
-
 lazy_static! {
-    static ref DEFAULT_API_URL: String =
-        std::env::var("DEFAULT_API_URL").expect("DEFAULT_API_URL is expected!");
+    pub static ref DEFAULT_API_URL: String =
+        std::env!("DEFAULT_API_URL").to_string();
 }
 
 lazy_static! {
-    static ref API_TOKEN_STORAGE_KEY: String =
-        std::env::var("API_TOKEN_STORAGE_KEY").expect("API_TOKEN_STORAGE_KEY is expected!");
+    pub static ref API_TOKEN_STORAGE_KEY: String =
+        std::env!("API_TOKEN_STORAGE_KEY").to_string();
 }
 
 lazy_static! {
-    static ref API_TOKEN_OTP_KEY: String =
-        std::env::var("API_TOKEN_OTP_KEY").expect("API_TOKEN_OTP_KEY is expected!");
+    pub static ref API_TOKEN_OTP_KEY: String =
+        std::env!("API_TOKEN_OTP_KEY").to_string();
 }
 
 #[component]

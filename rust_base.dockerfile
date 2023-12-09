@@ -1,7 +1,7 @@
-FROM rust
-RUN apt-get update \
-&& apt-get -y install clang \
-&& apt-get install \
-&& rustup target add wasm32-unknown-unknown \
-&& cargo install cargo-generate trunk \
-&& apt-get install libpq-dev
+FROM rust:latest
+RUN apt-get update
+RUN apt-get -y install clang
+RUN apt-get install
+RUn rustup target add wasm32-unknown-unknown 
+RUN cargo install cargo-generate trunk 
+RUN apt-get install libpq-dev
