@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   frontend:
-    image: joshuagoldman1994/auth2fa-app:1.0.0-t30
+    image: joshuagoldman1994/auth2fa-app:1.0.10
     build: 
       context: .
       dockerfile: ./prebuild.dockerfile
