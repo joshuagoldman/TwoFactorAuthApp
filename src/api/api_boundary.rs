@@ -43,6 +43,17 @@ pub struct TokenResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ResetPasswordRequest {
+    pub new_password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ValidatePasswordRequest {
+    pub password: String,
+    pub token: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OtpRequest {
     pub otp: TokenResponse,
 }

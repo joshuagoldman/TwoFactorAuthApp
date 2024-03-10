@@ -32,14 +32,23 @@ impl UnauthorizedApi {
     }
 
     pub async fn login(&self, credentials: &Credentials) -> ResultHandler<TokenResponse> {
-        let url = format!("{}/login", self.url);
-        self.check_connection(Request::post(&url))
-            .await
-            .pipe_result_action(|ok_req| ok_req.json(credentials))
-            .pipe_result_action_async(|ok_req| ok_req.send())
-            .await
-            .pipe_action_async(|response| into_json(response))
-            .await
+        //       let url = format!("{}/login", self.url);
+        //       self.check_connection(Request::post(&url))
+        //           .await .pipe_result_action(|ok_req| ok_req.json(credentials))
+        //           .pipe_result_action_async(|ok_req| ok_req.send())
+        //           .await
+        //           .pipe_action_async(|response| into_json(response))
+        //           .await
+
+        if credentials.username == "joshua".to_string()
+            && credentials.password == "joshua".to_string()
+        {
+            ResultHandler::OkResult(TokenResponse {
+                token: Uuid::new_v4().to_string(),
+            })
+        } else {
+            ResultHandler::ErrResult("Wrong user name or password".to_string())
+        }
     }
 
     pub async fn register(&self, new_user: &NewUser) -> ResultHandler<NewUserResponse> {
@@ -152,6 +161,49 @@ impl AuthorizedApi {
         let url = format!("{}/profileInfo", self.url);
         let res = self.send(Request::get(&url)).await;
         res
+    }
+
+    pub async fn reset_password(&self, password: &String) -> ResultHandler<bool> {
+        //       let url = format!("{}/login", self.url);
+        //       self.check_connection(Request::post(&url))
+        //           .await .pipe_result_action(|ok_req| ok_req.json(credentials))
+        //           .pipe_result_action_async(|ok_req| ok_req.send())
+        //           .await
+        //           .pipe_action_async(|response| into_json(response))
+        //           .await
+
+        let validate_password_req = ResetPasswordRequest {
+            new_password: password.clone(),
+        };
+        if password != &"fail".to_string() {
+            ResultHandler::OkResult(true)
+        } else {
+            ResultHandler::ErrResult("Reset of password failed".to_string())
+        }
+    }
+
+    pub async fn validate_password(
+        &self,
+        password: &String,
+        token: &String,
+    ) -> ResultHandler<bool> {
+        //       let url = format!("{}/login", self.url);
+        //       self.check_connection(Request::post(&url))
+        //           .await .pipe_result_action(|ok_req| ok_req.json(credentials))
+        //           .pipe_result_action_async(|ok_req| ok_req.send())
+        //           .await
+        //           .pipe_action_async(|response| into_json(response))
+        //           .await
+
+        let validate_password_req = ValidatePasswordRequest {
+            password: password.clone(),
+            token: token.clone(),
+        };
+        if password == &"joshua".to_string() {
+            ResultHandler::OkResult(true)
+        } else {
+            ResultHandler::ErrResult("Wrong password".to_string())
+        }
     }
 
     async fn send<T>(&self, req: RequestBuilder) -> ResultHandler<T>

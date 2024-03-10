@@ -5,16 +5,13 @@ use gloo_storage::{LocalStorage, Storage};
 use leptos::{
     component, create_action, create_signal, view, IntoView, Show, SignalGet, SignalUpdate,
 };
-use uuid::Uuid;
 
 use crate::{
-    api::{self, api_boundary::Credentials, AuthorizedApi, UnauthorizedApi},
+    api::{self, api_boundary::Credentials, UnauthorizedApi},
     components::login_form::*,
-    consts::API_TOKEN_STORAGE_KEY,
+    consts::API_TOKEN_OTP_KEY,
     misc,
 };
-
-use crate::consts::DEFAULT_API_URL;
 
 use super::Page;
 
@@ -28,16 +25,22 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
         async move {
             set_wait_for_response.update(|upd: &mut bool| *upd = true);
             task::sleep(Duration::from_secs(2)).await;
-            let auth_api = AuthorizedApi::new(
-                &DEFAULT_API_URL,
-                api::api_boundary::ApiToken {
-                    token: Uuid::new_v4().to_string(),
-                },
-            );
+            match unauth_api.login(&login_data).await {
+                api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                    //                   let auth_api = AuthorizedApi::new(
+                    //                       &DEFAULT_API_URL,
+                    //                       ApiToken {
+                    //                           token: token_resp.clone().token,
+                    //                       },
+                    //                   );
+                    LocalStorage::set(API_TOKEN_OTP_KEY.clone(), token_resp.token.clone());
+                    misc::go_to_page(Page::OtpValidation)
+                }
+                api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                    login_error_set.update(|x| *x = Some(err_msg));
+                }
+            }
             set_wait_for_response.update(|upd: &mut bool| *upd = false);
-            LocalStorage::set(API_TOKEN_STORAGE_KEY.clone(), auth_api);
-            misc::go_to_page(Page::Home)
-            //let result = unauthApi.login(&login_data).await;
         }
     });
 
@@ -46,7 +49,9 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
             when=move || wait_for_response.get()
             fallback = || view! { <div style="color:red">{"Loading"}</div>}
         >
-            <LoginForm login_action/>
+            <LoginForm login_action
+                       login_error
+       />
         </Show>
     }
 }

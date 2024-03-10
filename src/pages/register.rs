@@ -7,10 +7,11 @@ use crate::api::api_boundary::{NewUser, NewUserResponse, ResultHandler};
 use crate::api::UnauthorizedApi;
 use crate::consts::{
     EMAIL_FIELD_STR, FIRST_NAME_FIELD_STR, LAST_NAME_FIELD_STR, PASSWORD_FIELD_STR,
-    USER_NAME_FIELD_STR,
+    REPEAT_PASSWORD_FIELD_STR, USER_NAME_FIELD_STR,
 };
 use crate::{components::form_field::FormField, misc::RegisterFormField};
 use async_std::task;
+use std::collections::HashMap;
 use std::time::Duration;
 
 fn value_fullfills_req(str_val: &String, requirement: impl Fn(&String) -> bool) -> bool {
@@ -118,12 +119,18 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
             signal: create_rw_signal(String::new()),
         },
         RegisterFormField {
-            name: "Repeat Password".to_string(),
+            name: REPEAT_PASSWORD_FIELD_STR.to_string(),
             requirement: None,
             is_password: true,
             signal: create_rw_signal(String::new()),
         },
     ];
+
+    let mut form_fields_map: HashMap<String, RegisterFormField> = HashMap::new();
+
+    for (_, field) in form_fields.iter().enumerate() {
+        form_fields_map.insert(field.name.clone(), field.clone());
+    }
 
     let form_fields_password = form_fields.clone();
     let all_reqs_fullfilled = Signal::derive(move || {
@@ -144,46 +151,53 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
         }
     });
 
-    let text_fields = form_fields
-        .iter()
-        .filter(|form_field| {
-            !form_field.is_password && !form_field.name.to_uppercase().contains("EMAIL")
-        })
-        .map(|form_field| {
-            let form_field = form_field.clone();
-            view! {
-                <FormField form_field/>
-            }
-        })
-        .collect::<Vec<View>>();
+    let text_fields = vec![
+        form_fields_map
+            .get(&FIRST_NAME_FIELD_STR.clone())
+            .unwrap()
+            .clone(),
+        form_fields_map
+            .get(&LAST_NAME_FIELD_STR.clone())
+            .unwrap()
+            .clone(),
+    ]
+    .iter()
+    .map(|form_field| {
+        let form_field = form_field.clone();
+        view! {
+            <FormField form_field/>
+        }
+    })
+    .collect::<Vec<View>>();
 
-    let password_fields = form_fields
-        .iter()
-        .filter(|form_field| form_field.is_password)
-        .map(|form_field| {
-            let form_field = form_field.clone();
-            view! {
-                <FormField form_field/>
-            }
-        })
-        .collect::<Vec<View>>();
+    let password_fields = vec![
+        form_fields_map
+            .get(&PASSWORD_FIELD_STR.clone())
+            .unwrap()
+            .clone(),
+        form_fields_map
+            .get(&REPEAT_PASSWORD_FIELD_STR.clone())
+            .unwrap()
+            .clone(),
+    ]
+    .iter()
+    .map(|form_field| {
+        let form_field = form_field.clone();
+        view! {
+            <FormField form_field/>
+        }
+    })
+    .collect::<Vec<View>>();
 
-    let form_fields_email = form_fields.clone();
     let email_field = move || {
-        let email_field_opt = form_fields_email.iter().find(|form_field| {
-            !form_field.is_password && form_field.name.to_uppercase().contains("EMAIL")
-        });
+        let form_field_email = form_fields_map
+            .get(&EMAIL_FIELD_STR.clone())
+            .unwrap()
+            .clone();
 
-        if let Some(form_field) = email_field_opt {
-            let form_field = form_field.clone();
-            view! {
-                <FormField form_field/>
-            }
-        } else {
-            view! {
-                <div/>
-            }
-            .into_view()
+        let form_field = form_field_email.clone();
+        view! {
+            <FormField form_field/>
         }
     };
 

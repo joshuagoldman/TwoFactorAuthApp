@@ -2,7 +2,10 @@ use crate::api::api_boundary;
 use leptos::{ev, *};
 
 #[component]
-pub fn LoginForm(login_action: Action<api_boundary::Credentials, ()>) -> impl IntoView {
+pub fn LoginForm(
+    login_action: Action<api_boundary::Credentials, ()>,
+    login_error: ReadSignal<Option<String>>,
+) -> impl IntoView {
     let (password, set_password) = create_signal(String::new());
     let (username, set_username) = create_signal(String::new());
     let login_allowed = Signal::derive(move || {
@@ -77,6 +80,18 @@ pub fn LoginForm(login_action: Action<api_boundary::Credentials, ()>) -> impl In
 
                                 <div>
                                     <p class="mt-5 pb-lg-2 text-white">"Don't have an account? " <a href="/register" class="text-white-50 fw-bold">{"Sign Up"}</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mt-5 pb-lg-2 text-white"
+                                       style={move || {
+                                           if login_error.get().is_some() {
+                                              "color:red;display:none"
+                                            }
+                                            else {
+                                              "color:red"
+                                            }
+                                        }}>{move || login_error.get()}<a href="/register" class="text-white-50 fw-bold">{"Sign Up"}</a>
                                     </p>
                                 </div>
                             </div>
