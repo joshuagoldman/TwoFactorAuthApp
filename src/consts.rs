@@ -1,0 +1,33 @@
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref DEFAULT_API_URL: String = std::env!("DEFAULT_API_URL").to_string();
+}
+
+lazy_static! {
+    pub static ref API_TOKEN_STORAGE_KEY: String = std::env!("API_TOKEN_STORAGE_KEY").to_string();
+}
+
+lazy_static! {
+    pub static ref API_TOKEN_OTP_KEY: String = std::env!("API_TOKEN_OTP_KEY").to_string();
+}
+
+lazy_static! {
+    pub static ref USER_NAME_FIELD_STR: String = "User Name".to_string();
+}
+
+lazy_static! {
+    pub static ref FIRST_NAME_FIELD_STR: String = "First Name".to_string();
+}
+
+lazy_static! {
+    pub static ref LAST_NAME_FIELD_STR: String = "Last Name".to_string();
+}
+
+lazy_static! {
+    pub static ref EMAIL_FIELD_STR: String = "Email".to_string();
+}
+
+lazy_static! {
+    pub static ref PASSWORD_FIELD_STR: String = "Password".to_string();
+}
