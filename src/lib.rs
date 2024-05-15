@@ -12,10 +12,10 @@ mod misc;
 mod pages;
 
 use crate::api::api_boundary::ProfileInfo;
-use crate::misc::ApiSignals;
-use crate::misc::RouteWithApiStateCheck;
+use crate::misc::{ApiStateCheckView, ApiStateView};
 use crate::pages::home::Home;
 use crate::pages::login::Login;
+use crate::pages::register::Register;
 use crate::pages::Page;
 
 #[component]
@@ -27,6 +27,14 @@ pub fn App() -> impl IntoView {
         }
     };
     let unauth_view_func = Rc::new(unauth_view_func);
+
+    let register_view_func = move |unatuhorized_api: api::UnauthorizedApi| {
+        view! {
+            <Register unatuhorized_api
+            />
+        }
+    };
+    let register_view_func = Rc::new(register_view_func);
 
     let otp_auth_view_func = move |authorized_api: AuthorizedApi| {
         view! {
@@ -49,14 +57,27 @@ pub fn App() -> impl IntoView {
         <Router>
             <main>
                 <Routes>
-                    <RouteWithApiStateCheck
-                        path=Page::Home.path().to_string().clone()
-                        view = misc::ApiStateView::Auth(unauth_view_func.clone(),auth_view_func)
-                    />
-                    <RouteWithApiStateCheck
-                        path=Page::Login.path().to_string().clone()
-                        view = misc::ApiStateView::UnAuth(unauth_view_func)
-                    />
+                   // <RouteWithApiStateCheck
+                   //     path=Page::Home.path().to_string().clone()
+                   //     view = misc::ApiStateView::Auth(unauth_view_func.clone(),auth_view_func)
+                   // />
+                   // <RouteWithApiStateCheck
+                   //     path=Page::Login.path().to_string().clone()
+                   //     view = misc::ApiStateView::UnAuth(unauth_view_func.clone())
+                   // />
+                   // <RouteWithApiStateCheck
+                   //     path=Page::Register.path().to_string().clone()
+                   //     view = misc::ApiStateView::UnAuth(unauth_view_func)
+                   // />
+                  <Route
+                        path=Page::Register.path().to_string().clone()
+                        view= move || view! {
+                            <ApiStateCheckView
+                                view = misc::ApiStateView::UnAuth(register_view_func.clone())
+                            />
+                        }
+
+                  />
                 </Routes>
             </main>
         </Router>

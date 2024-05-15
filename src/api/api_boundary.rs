@@ -20,7 +20,7 @@ pub struct NewUser {
     pub email: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct NewUserResponse {
     pub first_name: String,
     pub last_name: String,
@@ -45,6 +45,8 @@ pub struct TokenResponse {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ResetPasswordRequest {
     pub new_password: String,
+    pub curr_password: String,
+    pub token: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

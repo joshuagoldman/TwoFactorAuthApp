@@ -44,7 +44,7 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
     let curr_field_val = create_rw_signal(String::new());
     let is_button_click_allowed = Signal::derive(move || !curr_field_val.get().is_empty());
 
-    let reset_action = create_action(move |field_val: &String| {
+    let reset_or_validate_action = create_action(move |_| {
         let authorized_api = authorized_api.clone();
 
         async move {
@@ -53,7 +53,20 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
 
             if is_enter_current_passwrd.get() {
                 match authorized_api
-                    .validate_password(&authorized_api.token.token, &field_val)
+                    .validate_password(&curr_field_val.get())
+                    .await
+                {
+                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                        is_enter_current_passwrd.update(|upd: &mut bool| *upd = false);
+                    }
+                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                        error_msg.update(|x| *x = Some(err_msg));
+                        misc::go_to_page(Page::Reset)
+                    }
+                }
+            } else {
+                match authorized_api
+                    .reset_password(&authorized_api.token.token, &curr_field_val.get())
                     .await
                 {
                     api::api_boundary::ResultHandler::OkResult(token_resp) => {
@@ -62,11 +75,12 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
                     }
                     api::api_boundary::ResultHandler::ErrResult(err_msg) => {
                         error_msg.update(|x| *x = Some(err_msg));
+                        LocalStorage::delete(&API_TOKEN_STORAGE_KEY.clone());
+                        misc::go_to_page(Page::Reset)
                     }
                 }
-            } else {
             }
-            set_wait_for_response.update(|upd: &mut bool| *upd = false);
+            is_loading.update(|upd: &mut bool| *upd = false);
         }
     });
 
@@ -88,7 +102,7 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
                                                 match &*ev.key() {
                                                     "enter" => {
                                                         if is_button_click_allowed.get() {
-                                                            dispatch_action();
+                                                            reset_or_validate_action.dispatch(());
                                                         }
                                                     }
                                                     _=> {
@@ -97,14 +111,14 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
                                                     }
                                                 }
                                             } />
-                                    <label class="form-label" for="typeEmailX">{"Username"}</label>
+                                    <label class="form-label" for="typeEmailX">{move || field_label.get()}</label>
                                 </div>
 
                                 <button class="btn btn-outline-light btn-lg px-5"
                                         type="submit"
-                                        disabled= {move || is_button_click_allowed.get()}
+                                        disabled= {move || !is_button_click_allowed.get()}
                                         on:click = move |_| {
-                                            dispatch_action();
+                                            reset_or_validate_action.dispatch(());
                                         }>{move || button_title.get()}</button>
                                 <div>
                                     <p class="mt-5 pb-lg-2 text-white"

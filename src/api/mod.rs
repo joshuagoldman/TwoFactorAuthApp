@@ -163,7 +163,11 @@ impl AuthorizedApi {
         res
     }
 
-    pub async fn reset_password(&self, password: &String) -> ResultHandler<bool> {
+    pub async fn reset_password(
+        &self,
+        password: &String,
+        new_password: &String,
+    ) -> ResultHandler<bool> {
         //       let url = format!("{}/login", self.url);
         //       self.check_connection(Request::post(&url))
         //           .await .pipe_result_action(|ok_req| ok_req.json(credentials))
@@ -174,19 +178,17 @@ impl AuthorizedApi {
 
         let validate_password_req = ResetPasswordRequest {
             new_password: password.clone(),
+            curr_password: new_password.clone(),
+            token: self.token.token.clone(),
         };
-        if password != &"fail".to_string() {
+        if password != &"password".to_string() {
             ResultHandler::OkResult(true)
         } else {
             ResultHandler::ErrResult("Reset of password failed".to_string())
         }
     }
 
-    pub async fn validate_password(
-        &self,
-        password: &String,
-        token: &String,
-    ) -> ResultHandler<bool> {
+    pub async fn validate_password(&self, password: &String) -> ResultHandler<bool> {
         //       let url = format!("{}/login", self.url);
         //       self.check_connection(Request::post(&url))
         //           .await .pipe_result_action(|ok_req| ok_req.json(credentials))
@@ -197,9 +199,9 @@ impl AuthorizedApi {
 
         let validate_password_req = ValidatePasswordRequest {
             password: password.clone(),
-            token: token.clone(),
+            token: self.token.token.clone(),
         };
-        if password == &"joshua".to_string() {
+        if password == &"password".to_string() {
             ResultHandler::OkResult(true)
         } else {
             ResultHandler::ErrResult("Wrong password".to_string())

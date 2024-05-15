@@ -1,6 +1,7 @@
+use leptos::leptos_dom::logging::console_log;
 use leptos::{
     component, create_action, create_rw_signal, create_trigger, view, Action, CollectView,
-    IntoView, RwSignal, Signal, SignalGet, SignalUpdate, View,
+    IntoView, RwSignal, Show, Signal, SignalGet, SignalUpdate, View,
 };
 
 use crate::api::api_boundary::{NewUser, NewUserResponse, ResultHandler};
@@ -29,27 +30,32 @@ fn on_register_click(
             .iter()
             .find(|x| x.name == USER_NAME_FIELD_STR.clone())
             .unwrap()
-            .name;
+            .name
+            .clone();
         let first_name = form_fields
             .iter()
             .find(|x| x.name == FIRST_NAME_FIELD_STR.clone())
             .unwrap()
-            .name;
+            .name
+            .clone();
         let last_name = form_fields
             .iter()
             .find(|x| x.name == LAST_NAME_FIELD_STR.clone())
             .unwrap()
-            .name;
+            .name
+            .clone();
         let email = form_fields
             .iter()
             .find(|x| x.name == EMAIL_FIELD_STR.clone())
             .unwrap()
-            .name;
+            .name
+            .clone();
         let password = form_fields
             .iter()
             .find(|x| x.name == PASSWORD_FIELD_STR.clone())
             .unwrap()
-            .name;
+            .name
+            .clone();
         let new_user = NewUser {
             username,
             first_name,
@@ -133,6 +139,7 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     }
 
     let form_fields_password = form_fields.clone();
+    let all_form_fields = form_fields.clone();
     let all_reqs_fullfilled = Signal::derive(move || {
         let password_fields: Vec<&RegisterFormField> = form_fields_password
             .iter()
@@ -142,10 +149,14 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
         if password_fields.len() > 1 {
             let password_field_1 = password_fields[0].signal.get();
             let password_field_2 = password_fields[1].signal.get();
+            let all_fields_non_empty = all_form_fields.iter().all(|x| !x.signal.get().is_empty());
 
-            !password_field_1.is_empty()
+            let res = !password_field_1.is_empty()
                 && !password_field_1.is_empty()
                 && password_field_1 == password_field_2
+                && all_fields_non_empty;
+
+            res
         } else {
             false
         }
@@ -158,6 +169,10 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
             .clone(),
         form_fields_map
             .get(&LAST_NAME_FIELD_STR.clone())
+            .unwrap()
+            .clone(),
+        form_fields_map
+            .get(&USER_NAME_FIELD_STR.clone())
             .unwrap()
             .clone(),
     ]
@@ -202,45 +217,69 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     };
 
     view! {
-        <div class="container">
-            <div class="row centered-form">
-                <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                                <h3 class="panel-title">{"Be a real nigga and sign up"}<small>{"It's free! (jews are fond of this concept)"}</small></h3>
-                        </div>
-                        <div class="panel-body">
-                            <form role="form">
-                                <div class="row">
-                                    {move || {
-                                      text_fields.clone().collect_view()
-                                    }}
-                                </div>
-                                <div class="row">
-                                    {move || {
-                                      email_field.clone()
-                                    }}
-                                </div>
-                                <div class="row">
-                                    {move || {
-                                      password_fields.clone().collect_view()
-                                    }}
-                                </div>
+        <div class="blurry-card">
+            <div class="container">
+                <div class="row centered-form">
+                    <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                    <h3 class="panel-title">{"Register"}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form role="form">
+                                    <div class="row">
+                                        {move || {
+                                            text_fields.clone().collect_view()
+                                        }}
+                                    </div>
+                                    <div class="row">
+                                        {move || {
+                                            email_field.clone()
+                                        }}
+                                    </div>
+                                    <div class="row">
+                                        {move || {
+                                            password_fields.clone().collect_view()
+                                        }}
+                                    </div>
                                     <input
-                                        type="submit"
                                         disabled= {move || !all_reqs_fullfilled.get()}
                                         value="Register"
                                         class="btn btn-info btn-block"
                                         on:click= {move |_|{
-                                          on_register_click(all_reqs_fullfilled,
+                                        on_register_click(all_reqs_fullfilled,
                                                             form_fields.clone(),
                                                             on_register);
-                                        }}/>
-                            </form>
+                                        }}
+                                    />
+                                    <Show
+                                        when= move  || registering_succeded.get().is_some()
+                                        fallback= move || view! { <div></div>}
+                                    >
+                                        <BarCode new_user_info=registering_succeded.get().unwrap_or_default()/>
+                                    </Show>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+    }
+}
+
+#[component]
+fn BarCode(new_user_info: NewUserResponse) -> impl IntoView {
+    view! {
+        <div>
+            <img id="barcode"
+                src={new_user_info.qr_code}
+                alt=""
+                title="Scan this with an authentication app"
+                width="200"
+                height="200"
+            />
         </div>
     }
 }
