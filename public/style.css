@@ -6,7 +6,7 @@ html,body{
 background-image: url('');
 background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://getwallpapers.com/wallpaper/full/c/0/f/104160.jpg');
 background-size: cover;
-background-repeat: no-repeat;
+background-repeat: repeat;
 height: 100%;
 padding: 30px;
 font-family: 'Numans', sans-serif;
@@ -20,7 +20,12 @@ font-family: 'Numans', sans-serif;
   backdrop-filter: blur(10.3px);
   -webkit-backdrop-filter: blur(10.3px);
   border: 1px solid rgba(61, 117, 151, 0.45);
-  height: 600px;
+  width: 700px;
+  color: black;
+  font-weight: bold;
+  padding: 20px;
+  margin-bottom: 20px;
+  height:100%
 }
 
 .centered-form{
@@ -38,23 +43,6 @@ font-family: 'Numans', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.otp-field input {
-  height: 45px;
-  width: 42px;
-  border-radius: 6px;
-  outline: none;
-  font-size: 1.125rem;
-  text-align: center;
-  border: 1px solid #ddd;
-}
-.otp-field input:focus {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
-}
-.otp-field input::-webkit-inner-spin-button,
-.otp-field input::-webkit-outer-spin-button {
-  display: none;
 }
 
 .resend {

@@ -1,0 +1,65 @@
+/* Made with love by Mutiullah Samim*/
+
+@import url('https://fonts.googleapis.com/css?family=Numans');
+
+html,body{
+background-image: url('');
+background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://getwallpapers.com/wallpaper/full/c/0/f/104160.jpg');
+background-size: cover;
+background-repeat: repeat;
+height: 100%;
+padding: 30px;
+font-family: 'Numans', sans-serif;
+}
+
+.blurry-card {
+  /* From https://css.glass */
+  background: rgba(61, 117, 151, 0.65);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10.3px);
+  -webkit-backdrop-filter: blur(10.3px);
+  border: 1px solid rgba(61, 117, 151, 0.45);
+  width: 700px;
+  color: black;
+  font-weight: bold;
+  padding: 20px;
+  margin-bottom: 20px;
+  height:100%
+}
+
+.centered-form{
+	margin-top: 60px;
+}
+
+.centered-form .panel{
+	background: rgba(255, 255, 255, 0.8);
+	box-shadow: rgba(0, 0, 0, 0.3) 20px 20px 20px;
+}
+
+.otp-field {
+  flex-direction: row;
+  column-gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resend {
+  font-size: 12px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: black;
+  font-size: 12px;
+  text-align: right;
+  font-family: monospace;
+}
+
+.footer a {
+  color: black;
+  text-decoration: none;
+}

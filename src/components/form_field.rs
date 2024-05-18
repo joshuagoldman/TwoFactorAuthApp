@@ -125,32 +125,26 @@ pub fn FormField(form_field: RegisterFormField) -> impl IntoView {
                 "color:red"
             }
         }
-        None => {
-            if !form_field.signal.get().is_empty() {
-                "color:black;"
-            } else {
-                "color:red"
-            }
-        }
+        None => "color:black;",
     });
 
     view! {
-        <div class="d-flex flex-row align-items-center mb-4">
+        <div class="d-flex flex-row align-items-center">
             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
             <div data-mdb-input-init class="form-outline flex-fill mb-0">
-            <input type={form_type} class="form-control"
-                    style={move || style.get()}
-                    on:keyup = move |ev: ev::KeyboardEvent| {
-                        match &*ev.key() {
-                            "enter" => {
-                            }
-                            _=> {
-                                let val = event_target_value(&ev);
-                                form_field.signal.update(|p|*p = val);
-                            }
-                    }}
-            />
-            <label class="form-label" for="form3Example3c">{form_field.name}</label>
+                <input type={form_type} class="form-control"
+                        style={move || style.get()}
+                        on:keyup = move |ev: ev::KeyboardEvent| {
+                            match &*ev.key() {
+                                "enter" => {
+                                }
+                                _=> {
+                                    let val = event_target_value(&ev);
+                                    form_field.signal.update(|p|*p = val);
+                                }
+                        }}
+                />
+                <label class="form-label" for="form3Example3c">{form_field.name}</label>
             </div>
         </div>
     }

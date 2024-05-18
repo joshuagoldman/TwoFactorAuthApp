@@ -60,52 +60,63 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     let all_reqs_fulfilled = all_reqs_fulfilled_func(form_fields, error_fields_signal);
 
     view! {
-        <div class="container h-50">
-            <div class="row d-flex justify-content-center align-items-center h-50">
-            <div class="col-lg-12 col-xl-11">
-                <div class="card text-black" style="border-radius: 25px;">
-                <div class="card-body p-md-5">
+        <div class="container">
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="blurry-card" style={move || format!("height:100%")}>
                     <div class="row justify-content-center">
-                    <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+                        <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
-                        <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Register</p>
-
-                        <form class="mx-1 mx-md-4">
                             <Show
-                                when= move  || !registering.get()
-                                fallback= move || view! { <div>{"Registering..."}</div>}
-                            >
-                                <RegisterFields
-                                    form_fields_map= form_fields_map_signal
-                                    all_reqs_fulfilled
-                                    on_register
-                                >
-                                </RegisterFields>
-                            </Show>
-                            <Show
-                                when= move  || registering_succeded.get().is_some()
+                                when= move  || !registering.get() && registering_succeded.get().is_none()
                                 fallback= move || view! { <div></div>}
                             >
-                                <BarCode new_user_info=registering_succeded.get().unwrap_or_default()/>
+                                <p class="text-center h3 fw-bold mb-2 mx-1 mx-md-4 mt-4">Register</p>
                             </Show>
-                            <TextFieldErrors
-                                error_fields_signal
-                            >
-                            </TextFieldErrors>
-                        </form>
-                    </div>
-                    <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
 
-                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
-                        class="img-fluid" alt="Sample image"/>
-
-                    </div>
+                            <form class="mx-1 mx-md-4">
+                                <Show
+                                    when= move  || !registering.get() && registering_succeded.get().is_none()
+                                    fallback= move || view! {
+                                        <Registering is_registering=registering></Registering>
+                                    }
+                                >
+                                    <RegisterFields
+                                        form_fields_map= form_fields_map_signal
+                                        all_reqs_fulfilled
+                                        on_register
+                                    >
+                                    </RegisterFields>
+                                </Show>
+                                <TextFieldErrors
+                                    error_fields_signal
+                                >
+                                </TextFieldErrors>
+                            </form>
+                        </div>
+                        <Show
+                            when= move  || registering_succeded.get().is_some()
+                            fallback= move || view! { <div></div>}
+                        >
+                            <BarCode new_user_info=registering_succeded.get().unwrap_or_default()/>
+                        </Show>
                     </div>
                 </div>
-                </div>
-            </div>
             </div>
         </div>
+    }
+}
+
+#[component]
+fn Registering(is_registering: RwSignal<bool>) -> impl IntoView {
+    view! {
+        <Show
+            when= move  || is_registering.get()
+            fallback= move || view! {
+                <div>{"Registering succeeded. Scan the qr code above in an authentication app"}</div>
+            }
+        >
+            <div>{"Registering..."}</div>
+        </Show>
     }
 }
 
@@ -134,14 +145,16 @@ fn RegisterFields(
 #[component]
 fn BarCode(new_user_info: NewUserResponse) -> impl IntoView {
     view! {
-        <div>
-            <img id="barcode"
-                src={new_user_info.qr_code}
-                alt=""
-                title="Scan this with an authentication app"
-                width="200"
-                height="200"
-            />
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div>
+                <img id="barcode"
+                    src={new_user_info.qr_code}
+                    alt=""
+                    title="Scan this with an authentication app"
+                    width="200"
+                    height="200"
+                />
+            </div>
         </div>
     }
 }
