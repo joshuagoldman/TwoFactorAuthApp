@@ -16,10 +16,16 @@ use crate::{
     pages::login::Login,
 };
 
+#[derive(Clone)]
+pub struct Requirement {
+    pub func: Rc<dyn Fn(&String) -> bool>,
+    pub fail_msg: String,
+}
+
 #[derive(Clone, Default)]
 pub struct RegisterFormField {
     pub name: String,
-    pub requirement: Option<Rc<dyn Fn(&String) -> bool>>,
+    pub requirement: Option<Requirement>,
     pub is_password: bool,
     pub signal: RwSignal<String>,
 }
