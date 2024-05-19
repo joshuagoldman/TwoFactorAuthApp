@@ -4,16 +4,20 @@ use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
     component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, ChildrenFn,
-    IntoView, RwSignal, Show, SignalGet, SignalGetUntracked, SignalUpdate, ViewFn,
+    IntoView, RwSignal, Show, Signal, SignalGet, SignalGetUntracked, SignalUpdate, ViewFn,
 };
 use leptos_router::{use_navigate, Route};
 use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::{self, api_boundary::ResultHandler, AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi},
+    api::{
+        self,
+        api_boundary::{ApiToken, ResultHandler},
+        AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi,
+    },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
-    pages::login::Login,
+    pages::login::view::Login,
 };
 
 #[derive(Clone)]
@@ -59,6 +63,13 @@ pub fn go_to_page(page: crate::pages::Page) {
 }
 
 pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
+    console_log(
+        format!(
+            "{:>?}",
+            LocalStorage::get::<ApiToken>(API_TOKEN_OTP_KEY.clone())
+        )
+        .as_str(),
+    );
     task::sleep(Duration::from_secs(2)).await;
     if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.clone()) {
         let api = api::AuthorizedApi::new(&DEFAULT_API_URL, token);
@@ -88,6 +99,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
                         .otpauth
                         .update(|api_curr| *api_curr = Some(api));
                     go_to_page(crate::pages::Page::OtpValidation);
+                    api_set_signals.is_resolved.update(|x| *x = true);
                     return;
                 }
             }
@@ -104,6 +116,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
     api_set_signals.is_resolved.update(|x| *x = true);
 }
 
+#[derive(Clone)]
 pub enum ApiStateView<F>
 where
     F: IntoView + 'static,
@@ -130,45 +143,49 @@ where
 
     check_logged_in.dispatch(api_signals);
 
-    let view = match view {
-        ApiStateView::UnAuth(view_func_unauth) => {
-            if let Some(unauth_api) = api_signals.unauth.get_untracked() {
-                view_func_unauth(unauth_api)
-            } else {
-                let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
-                view_func_unauth(unauth_api)
+    let view_signal = Signal::derive(move || {
+        let view = match view.clone() {
+            ApiStateView::UnAuth(view_func_unauth) => {
+                if let Some(unauth_api) = api_signals.unauth.get() {
+                    view_func_unauth(unauth_api)
+                } else {
+                    let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
+                    view_func_unauth(unauth_api)
+                }
             }
-        }
-        ApiStateView::OTPAuth(view_func_unauth, view_func_otp_auth) => {
-            if let Some(otpAuth) = api_signals.otpauth.get_untracked() {
-                view_func_otp_auth(otpAuth)
-            } else if let Some(unauth_api) = api_signals.unauth.get_untracked() {
-                view_func_unauth(unauth_api)
-            } else {
-                let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
-                view_func_unauth(unauth_api)
+            ApiStateView::OTPAuth(view_func_unauth, view_func_otp_auth) => {
+                if let Some(otpAuth) = api_signals.otpauth.get() {
+                    view_func_otp_auth(otpAuth)
+                } else if let Some(unauth_api) = api_signals.unauth.get() {
+                    go_to_page(crate::pages::Page::Login);
+                    view_func_unauth(unauth_api)
+                } else {
+                    let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
+                    go_to_page(crate::pages::Page::Login);
+                    view_func_unauth(unauth_api)
+                }
             }
-        }
-        ApiStateView::Auth(view_func_unauth, view_func_auth) => {
-            if let Some(authApi) = api_signals.auth.get_untracked() {
-                view_func_auth(authApi)
-            } else if let Some(unauth_api) = api_signals.unauth.get_untracked() {
-                view_func_unauth(unauth_api)
-            } else {
-                let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
-                view_func_unauth(unauth_api)
+            ApiStateView::Auth(view_func_unauth, view_func_auth) => {
+                if let Some(authApi) = api_signals.auth.get() {
+                    view_func_auth(authApi)
+                } else if let Some(unauth_api) = api_signals.unauth.get() {
+                    view_func_unauth(unauth_api)
+                } else {
+                    let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
+                    view_func_unauth(unauth_api)
+                }
             }
-        }
-    };
+        };
+        view
+    });
 
     view! {
         <Show when = move || api_signals.is_resolved.get()
                 fallback = move || {
-                    console_log("fallback");
-                    view! { <div class="color:white;">{"Loading..."}</div>}
+                    view! { <div style="color:white;">{"Loading..."}</div>}
                 }
         >
-            {view.clone()}
+            {move || view_signal.get()}
         </Show>
     }
 }

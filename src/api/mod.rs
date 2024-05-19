@@ -134,9 +134,10 @@ impl OtpAuthorizedApi {
     }
 
     pub async fn has_expired(&self) -> ResultHandler<bool> {
-        let url = format!("{}/otpExpired", self.url);
-        let res = self.send(Request::get(&url)).await;
-        res
+        //let url = format!("{}/otpExpired", self.url);
+        //let res = self.send(Request::get(&url)).await;
+        //res
+        ResultHandler::OkResult(false)
     }
 
     pub async fn check_connection(&self, req: RequestBuilder) -> ResultHandler<RequestBuilder> {
