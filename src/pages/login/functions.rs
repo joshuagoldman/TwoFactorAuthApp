@@ -1,8 +1,6 @@
-use std::{collections::HashMap, fmt::format};
+use std::collections::HashMap;
 
-use leptos::{
-    create_rw_signal, leptos_dom::logging::console_log, RwSignal, Signal, SignalGet, SignalWith,
-};
+use leptos::{RwSignal, Signal, SignalGet};
 
 use crate::{
     consts::{PASSWORD_FIELD_STR, USER_NAME_FIELD_STR},

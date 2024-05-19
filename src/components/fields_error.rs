@@ -1,7 +1,4 @@
-use leptos::{
-    component, leptos_dom::logging::console_log, view, CollectView, IntoView, Show, Signal,
-    SignalGet, View,
-};
+use leptos::{component, view, IntoView, Show, Signal, SignalGet, View};
 
 use crate::misc::RegisterFormField;
 

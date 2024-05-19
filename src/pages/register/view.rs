@@ -1,26 +1,18 @@
-use leptos::leptos_dom::logging::console_log;
 use leptos::{
-    component, create_action, create_rw_signal, create_trigger, view, Action, CollectView,
-    IntoView, RwSignal, Show, Signal, SignalGet, SignalGetUntracked, SignalUpdate, SignalWith,
-    View,
+    component, create_action, create_rw_signal, view, Action, IntoView, RwSignal, Show, Signal,
+    SignalGet, SignalUpdate,
 };
 
 use crate::api::api_boundary::{NewUser, NewUserResponse, ResultHandler};
 use crate::api::UnauthorizedApi;
-use crate::components::fields_error::{get_all_error_fields, TextFieldErrors};
-use crate::components::form_field::{AllRegisterFields, EmailField, PasswordFields, TextFields};
-use crate::consts::{
-    EMAIL_FIELD_STR, FIRST_NAME_FIELD_STR, LAST_NAME_FIELD_STR, PASSWORD_FIELD_STR,
-    REPEAT_PASSWORD_FIELD_STR, USER_NAME_FIELD_STR,
-};
+use crate::components::fields_error::TextFieldErrors;
+use crate::components::form_field::AllRegisterFields;
 use crate::misc::RegisterFormField;
-use crate::misc::Requirement;
 use crate::pages::register::functions::{
     all_reqs_fulfilled_func, get_form_fields_signals, on_register_click,
 };
 use async_std::task;
 use std::collections::HashMap;
-use std::rc::Rc;
 use std::time::Duration;
 
 #[component]

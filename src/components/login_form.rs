@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{
-    api::api_boundary::{self, Credentials},
+    api::api_boundary::Credentials,
     components::form_field::FormField,
     consts::{PASSWORD_FIELD_STR, USER_NAME_FIELD_STR},
     misc::RegisterFormField,
-    pages::login,
 };
-use leptos::{ev, *};
+use leptos::*;
 
 #[component]
 pub fn LoginForm(

@@ -153,15 +153,20 @@ impl AuthorizedApi {
         format!("Bearer {}", self.token.token)
     }
     pub async fn has_expired(&self) -> ResultHandler<bool> {
-        let url = format!("{}/expired", self.url);
-        let res = self.send(Request::get(&url)).await;
-        res
+        //let url = format!("{}/expired", self.url);
+        //let res = self.send(Request::get(&url)).await;
+        //res
+        ResultHandler::OkResult(false)
     }
 
     pub async fn get_user_data(&self) -> ResultHandler<ProfileInfo> {
-        let url = format!("{}/profileInfo", self.url);
-        let res = self.send(Request::get(&url)).await;
-        res
+        //let url = format!("{}/profileInfo", self.url);
+        //let res = self.send(Request::get(&url)).await;
+        //res
+
+        ResultHandler::OkResult(ProfileInfo {
+            name: "Swag Johnson".to_string(),
+        })
     }
 
     pub async fn reset_password(

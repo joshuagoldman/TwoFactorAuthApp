@@ -1,14 +1,13 @@
-use std::{future::Future, ops::Deref, rc::Rc, time::Duration};
+use std::{rc::Rc, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, ChildrenFn,
-    IntoView, RwSignal, Show, Signal, SignalGet, SignalGetUntracked, SignalUpdate, ViewFn,
+    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, IntoView,
+    RwSignal, Show, Signal, SignalGet, SignalUpdate,
 };
-use leptos_router::{use_navigate, Route};
+use leptos_router::use_navigate;
 use log::info;
-use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{
@@ -17,7 +16,6 @@ use crate::{
         AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi,
     },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
-    pages::login::view::Login,
 };
 
 #[derive(Clone)]
@@ -67,6 +65,13 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
         format!(
             "{:>?}",
             LocalStorage::get::<ApiToken>(API_TOKEN_OTP_KEY.clone())
+        )
+        .as_str(),
+    );
+    console_log(
+        format!(
+            "{:>?}",
+            LocalStorage::get::<ApiToken>(API_TOKEN_STORAGE_KEY.clone())
         )
         .as_str(),
     );

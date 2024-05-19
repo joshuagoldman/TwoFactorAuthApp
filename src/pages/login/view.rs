@@ -3,8 +3,8 @@ use std::time::Duration;
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, IntoView,
-    RwSignal, Show, Signal, SignalGet, SignalUpdate, SignalWith,
+    component, create_action, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet,
+    SignalUpdate,
 };
 
 use crate::{

@@ -13,9 +13,10 @@ mod pages;
 
 use crate::api::api_boundary::ProfileInfo;
 use crate::api::OtpAuthorizedApi;
-use crate::misc::{ApiStateCheckView, ApiStateView};
+use crate::misc::ApiStateCheckView;
 use crate::pages::home::Home;
 use crate::pages::login::view::Login;
+use crate::pages::otp::Otp;
 use crate::pages::register::view::Register;
 use crate::pages::Page;
 
@@ -39,7 +40,7 @@ pub fn App() -> impl IntoView {
 
     let otp_auth_view_func = move |otp_auth_api: OtpAuthorizedApi| {
         view! {
-            <div style="color:white">{"Not yet implemented"}</div>
+            <Otp otp_auth_api ></Otp>
         }
         .into_view()
     };
@@ -55,6 +56,7 @@ pub fn App() -> impl IntoView {
     };
     let auth_view_func = Rc::new(auth_view_func);
     let unauth_view_func_login = unauth_view_func.clone();
+    let unauth_view_func_home = unauth_view_func.clone();
 
     view! {
         <Router>
@@ -84,6 +86,16 @@ pub fn App() -> impl IntoView {
                             <ApiStateCheckView
                                 view = misc::ApiStateView::OTPAuth(unauth_view_func.clone(),
                                                                   otp_auth_view_func.clone())
+                            />
+                        }
+
+                  />
+                  <Route
+                        path=Page::Home.path().to_string().clone()
+                        view= move || view! {
+                            <ApiStateCheckView
+                                view = misc::ApiStateView::Auth(unauth_view_func_home.clone(),
+                                                                  auth_view_func.clone())
                             />
                         }
 
