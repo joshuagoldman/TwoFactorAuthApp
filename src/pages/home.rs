@@ -1,11 +1,12 @@
 use std::time::Duration;
 
 use async_std::task;
-use leptos::{
-    component, create_action, view, IntoView, RwSignal, SignalGet, SignalUpdate,
-};
+use leptos::{component, create_action, view, IntoView, RwSignal, SignalGet, SignalUpdate};
 
-use crate::api::{api_boundary::ProfileInfo, AuthorizedApi};
+use crate::{
+    api::{api_boundary::ProfileInfo, AuthorizedApi},
+    misc,
+};
 
 #[component]
 pub fn Home(
@@ -42,5 +43,10 @@ pub fn Home(
                 }
             }
         }
+        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+            <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                        on:click= {move |_| misc::log_out() }
+            >Login</button>
+        </div>
     }
 }

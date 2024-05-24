@@ -214,6 +214,19 @@ impl AuthorizedApi {
         }
     }
 
+    pub async fn delete_account(&self) -> ResultHandler<bool> {
+        //       let url = format!("{}/delete", self.url);
+        // self.check_connection(Request::delete(&url))
+        //           .await
+        //           .pipe_result_action(|ok_req| ok_req.json(credentials))
+        //           .pipe_result_action_async(|ok_req| ok_req.send())
+        //           .await
+        //           .pipe_action_async(|response| into_json(response))
+        //           .await
+
+        ResultHandler::OkResult(true)
+    }
+
     async fn send<T>(&self, req: RequestBuilder) -> ResultHandler<T>
     where
         T: DeserializeOwned,

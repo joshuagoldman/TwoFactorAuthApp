@@ -12,6 +12,15 @@ pub struct Credentials {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct User {
+    pub username: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NewUser {
     pub username: String,
     pub password: String,
@@ -30,6 +39,7 @@ pub struct NewUserResponse {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProfileInfo {
     pub name: String,
+    pub id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

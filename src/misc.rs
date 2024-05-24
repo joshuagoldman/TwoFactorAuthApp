@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Duration};
+use std::{path::Path, rc::Rc, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
@@ -16,6 +16,7 @@ use crate::{
         AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi,
     },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
+    pages::Page,
 };
 
 #[derive(Clone)]
@@ -58,6 +59,13 @@ impl ApiSignals {
 pub fn go_to_page(page: crate::pages::Page) {
     let navigate = use_navigate();
     navigate(page.path(), Default::default());
+}
+
+pub fn log_out() {
+    LocalStorage::delete(API_TOKEN_OTP_KEY.clone());
+    LocalStorage::delete(API_TOKEN_STORAGE_KEY.clone());
+    let navigate = use_navigate();
+    navigate(Page::Login.path(), Default::default());
 }
 
 pub async fn check_user_logged_in(api_set_signals: ApiSignals) {

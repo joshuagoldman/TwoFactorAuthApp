@@ -1,21 +1,136 @@
-use std::time::Duration;
+use std::{future::Future, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, ev, event_target_value, view, IntoView, Signal,
-    SignalGet, SignalUpdate,
+    component, create_action, create_rw_signal, ev, event_target_value, html::Output, view, Action,
+    IntoView, RwSignal, Signal, SignalGet, SignalUpdate,
 };
 
 use crate::{
-    api::{self, AuthorizedApi},
+    api::{
+        self,
+        api_boundary::{ProfileInfo, User},
+        AuthorizedApi,
+    },
     consts::API_TOKEN_STORAGE_KEY,
     misc,
     pages::Page,
 };
 
+pub enum PassVerificationAction {
+    ResetPassword,
+    DeleteAccount,
+}
+
+struct PassVerificationActionData {
+    authorized_api: AuthorizedApi,
+    user_data: ProfileInfo,
+    is_loading: RwSignal<bool>,
+    is_enter_current_passwrd: RwSignal<bool>,
+    curr_field_val: RwSignal<String>,
+    error_msg: RwSignal<Option<String>>,
+}
+
+fn reset_action() -> Action<PassVerificationActionData, ()> {
+    create_action(move |pass_ver_data: &PassVerificationActionData| {
+        let authorized_api = pass_ver_data.authorized_api.clone();
+
+        async move {
+            pass_ver_data
+                .is_loading
+                .update(|upd: &mut bool| *upd = true);
+            task::sleep(Duration::from_secs(2)).await;
+
+            if pass_ver_data.is_enter_current_passwrd.get() {
+                match authorized_api
+                    .validate_password(&pass_ver_data.curr_field_val.get())
+                    .await
+                {
+                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                        pass_ver_data
+                            .is_enter_current_passwrd
+                            .update(|upd: &mut bool| *upd = false);
+                    }
+                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                        pass_ver_data.error_msg.update(|x| *x = Some(err_msg));
+                        misc::go_to_page(Page::Reset)
+                    }
+                }
+            } else {
+                match authorized_api
+                    .reset_password(
+                        &authorized_api.token.token,
+                        &pass_ver_data.curr_field_val.get(),
+                    )
+                    .await
+                {
+                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                        misc::log_out();
+                    }
+                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                        pass_ver_data.error_msg.update(|x| *x = Some(err_msg));
+                        LocalStorage::delete(&API_TOKEN_STORAGE_KEY.clone());
+                        misc::go_to_page(Page::Reset)
+                    }
+                }
+            }
+            pass_ver_data
+                .is_loading
+                .update(|upd: &mut bool| *upd = false);
+        }
+    })
+}
+
+fn delete_account_action() -> Action<PassVerificationActionData, ()> {
+    create_action(move |pass_ver_data: &PassVerificationActionData| {
+        let authorized_api = pass_ver_data.authorized_api.clone();
+
+        async move {
+            pass_ver_data
+                .is_loading
+                .update(|upd: &mut bool| *upd = true);
+            task::sleep(Duration::from_secs(2)).await;
+
+            if pass_ver_data.is_enter_current_passwrd.get() {
+                match authorized_api
+                    .validate_password(&pass_ver_data.curr_field_val.get())
+                    .await
+                {
+                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                        pass_ver_data
+                            .is_enter_current_passwrd
+                            .update(|upd: &mut bool| *upd = false);
+                    }
+                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                        pass_ver_data.error_msg.update(|x| *x = Some(err_msg));
+                        misc::go_to_page(Page::Reset)
+                    }
+                }
+            } else {
+                match authorized_api.delete_account().await {
+                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                        misc::log_out();
+                    }
+                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                        pass_ver_data.error_msg.update(|x| *x = Some(err_msg));
+                        LocalStorage::delete(&API_TOKEN_STORAGE_KEY.clone());
+                        misc::go_to_page(Page::Reset)
+                    }
+                }
+            }
+            pass_ver_data
+                .is_loading
+                .update(|upd: &mut bool| *upd = false);
+        }
+    })
+}
+
 #[component]
-pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
+pub fn PasswordVerification(
+    authorized_api: AuthorizedApi,
+    action_to_perform: PassVerificationAction,
+) -> impl IntoView {
     let error_msg = create_rw_signal(None::<String>);
     let is_enter_current_passwrd = create_rw_signal(true);
     let is_loading = create_rw_signal(false);
@@ -43,45 +158,10 @@ pub fn PasswordReset(authorized_api: AuthorizedApi) -> impl IntoView {
     let curr_field_val = create_rw_signal(String::new());
     let is_button_click_allowed = Signal::derive(move || !curr_field_val.get().is_empty());
 
-    let reset_or_validate_action = create_action(move |_| {
-        let authorized_api = authorized_api.clone();
-
-        async move {
-            is_loading.update(|upd: &mut bool| *upd = true);
-            task::sleep(Duration::from_secs(2)).await;
-
-            if is_enter_current_passwrd.get() {
-                match authorized_api
-                    .validate_password(&curr_field_val.get())
-                    .await
-                {
-                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
-                        is_enter_current_passwrd.update(|upd: &mut bool| *upd = false);
-                    }
-                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
-                        error_msg.update(|x| *x = Some(err_msg));
-                        misc::go_to_page(Page::Reset)
-                    }
-                }
-            } else {
-                match authorized_api
-                    .reset_password(&authorized_api.token.token, &curr_field_val.get())
-                    .await
-                {
-                    api::api_boundary::ResultHandler::OkResult(token_resp) => {
-                        LocalStorage::delete(&API_TOKEN_STORAGE_KEY.clone());
-                        misc::go_to_page(Page::Login)
-                    }
-                    api::api_boundary::ResultHandler::ErrResult(err_msg) => {
-                        error_msg.update(|x| *x = Some(err_msg));
-                        LocalStorage::delete(&API_TOKEN_STORAGE_KEY.clone());
-                        misc::go_to_page(Page::Reset)
-                    }
-                }
-            }
-            is_loading.update(|upd: &mut bool| *upd = false);
-        }
-    });
+    let action_to_perform = match action_to_perform {
+        PassVerificationAction::ResetPassword => reset_action(),
+        PassVerificationAction::DeleteAccount => delete_account_action(),
+    };
 
     view! {
             <div class="row d-flex justify-content-center align-items-center h-10">
