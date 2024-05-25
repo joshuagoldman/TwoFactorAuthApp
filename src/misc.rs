@@ -1,4 +1,4 @@
-use std::{path::Path, rc::Rc, time::Duration};
+use std::{rc::Rc, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
@@ -26,7 +26,7 @@ pub struct Requirement {
 }
 
 #[derive(Clone, Default)]
-pub struct RegisterFormField {
+pub struct GeneralFormField {
     pub name: String,
     pub requirement: Option<Requirement>,
     pub is_password: bool,

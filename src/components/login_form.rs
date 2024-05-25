@@ -4,13 +4,13 @@ use crate::{
     api::api_boundary::Credentials,
     components::form_field::FormField,
     consts::{PASSWORD_FIELD_STR, USER_NAME_FIELD_STR},
-    misc::RegisterFormField,
+    misc::GeneralFormField,
 };
 use leptos::*;
 
 #[component]
 pub fn LoginForm(
-    login_fields_map_signal: Signal<HashMap<String, RegisterFormField>>,
+    login_fields_map_signal: Signal<HashMap<String, GeneralFormField>>,
     credentials: Signal<Option<Credentials>>,
     on_login: Action<Credentials, ()>,
 ) -> impl IntoView {
@@ -28,7 +28,7 @@ pub fn LoginForm(
 
 #[component]
 pub fn AllLoginFields(
-    login_fields_map_signal: Signal<HashMap<String, RegisterFormField>>,
+    login_fields_map_signal: Signal<HashMap<String, GeneralFormField>>,
 ) -> impl IntoView {
     let username_field_signal = Signal::derive(move || {
         login_fields_map_signal

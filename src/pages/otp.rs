@@ -104,7 +104,7 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
             task::sleep(Duration::from_secs(2)).await;
             match otp_auth_api.check_otp(&otp).await {
                 ResultHandler::OkResult(ok_res) => {
-                    LocalStorage::set(API_TOKEN_STORAGE_KEY.clone(), ok_res.token.clone());
+                    LocalStorage::set(API_TOKEN_STORAGE_KEY.clone(), ok_res.token.clone()).unwrap();
                     misc::go_to_page(Page::Home);
                 }
                 ResultHandler::ErrResult(err_msg_str) => {

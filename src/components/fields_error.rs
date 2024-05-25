@@ -1,8 +1,8 @@
 use leptos::{component, view, IntoView, Show, Signal, SignalGet, View};
 
-use crate::misc::RegisterFormField;
+use crate::misc::GeneralFormField;
 
-pub fn get_all_error_fields(reg_form_fields: Vec<RegisterFormField>) -> Signal<Vec<String>> {
+pub fn get_all_error_fields(reg_form_fields: Vec<GeneralFormField>) -> Signal<Vec<String>> {
     Signal::derive(move || {
         let mut errors = reg_form_fields
             .iter()

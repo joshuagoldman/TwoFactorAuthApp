@@ -9,12 +9,12 @@ use crate::{
         EMAIL_FIELD_STR, FIRST_NAME_FIELD_STR, LAST_NAME_FIELD_STR, PASSWORD_FIELD_STR,
         REPEAT_PASSWORD_FIELD_STR, USER_NAME_FIELD_STR,
     },
-    misc::RegisterFormField,
+    misc::GeneralFormField,
 };
 
 #[component]
 pub fn AllRegisterFields(
-    form_fields_map: Signal<HashMap<String, RegisterFormField>>,
+    form_fields_map: Signal<HashMap<String, GeneralFormField>>,
 ) -> impl IntoView {
     view! {
         <TextFields form_fields_map></TextFields>
@@ -24,7 +24,7 @@ pub fn AllRegisterFields(
 }
 
 #[component]
-pub fn TextFields(form_fields_map: Signal<HashMap<String, RegisterFormField>>) -> impl IntoView {
+pub fn TextFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
     let text_fields_signal = Signal::derive(move || {
         vec![
             form_fields_map
@@ -61,9 +61,7 @@ pub fn TextFields(form_fields_map: Signal<HashMap<String, RegisterFormField>>) -
 }
 
 #[component]
-pub fn PasswordFields(
-    form_fields_map: Signal<HashMap<String, RegisterFormField>>,
-) -> impl IntoView {
+pub fn PasswordFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
     let password_fields_signal = Signal::derive(move || {
         vec![
             form_fields_map
@@ -95,7 +93,7 @@ pub fn PasswordFields(
 }
 
 #[component]
-pub fn EmailField(form_fields_map: Signal<HashMap<String, RegisterFormField>>) -> impl IntoView {
+pub fn EmailField(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
     let email_field_signal = Signal::derive(move || {
         form_fields_map
             .get()
@@ -110,7 +108,7 @@ pub fn EmailField(form_fields_map: Signal<HashMap<String, RegisterFormField>>) -
 }
 
 #[component]
-pub fn FormField(form_field: RegisterFormField) -> impl IntoView {
+pub fn FormField(form_field: GeneralFormField) -> impl IntoView {
     let form_type = if form_field.is_password {
         "password"
     } else {

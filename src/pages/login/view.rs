@@ -60,7 +60,8 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
                         ApiToken {
                             token: token_resp.token,
                         },
-                    );
+                    )
+                    .unwrap();
                     misc::go_to_page(Page::OtpValidation)
                 }
                 api::api_boundary::ResultHandler::ErrResult(err_msg) => {

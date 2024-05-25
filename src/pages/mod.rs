@@ -1,8 +1,8 @@
 pub mod home;
 pub mod login;
 pub mod otp;
+pub mod password_verification;
 pub mod register;
-pub mod reset_password;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub enum Page {
@@ -12,6 +12,7 @@ pub enum Page {
     OtpValidation,
     Register,
     Reset,
+    Delete,
 }
 
 impl Page {
@@ -22,6 +23,7 @@ impl Page {
             Self::OtpValidation => "/otp",
             Self::Register => "/register",
             Self::Reset => "/reset",
+            Self::Delete => "/delete",
         }
     }
 }

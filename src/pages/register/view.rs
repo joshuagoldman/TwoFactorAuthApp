@@ -7,7 +7,7 @@ use crate::api::api_boundary::{NewUser, NewUserResponse, ResultHandler};
 use crate::api::UnauthorizedApi;
 use crate::components::fields_error::TextFieldErrors;
 use crate::components::form_field::AllRegisterFields;
-use crate::misc::RegisterFormField;
+use crate::misc::GeneralFormField;
 use crate::pages::register::functions::{
     all_reqs_fulfilled_func, get_form_fields_signals, on_register_click,
 };
@@ -44,7 +44,7 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     let (form_fields, error_fields_signal) = get_form_fields_signals();
 
     let form_fields_map_signal = Signal::derive(move || {
-        let mut form_fields_map: HashMap<String, RegisterFormField> = HashMap::new();
+        let mut form_fields_map: HashMap<String, GeneralFormField> = HashMap::new();
 
         for (_, field) in form_fields.get().iter().enumerate() {
             form_fields_map.insert(field.name.clone(), field.clone());
@@ -117,7 +117,7 @@ fn Registering(is_registering: RwSignal<bool>) -> impl IntoView {
 
 #[component]
 fn RegisterFields(
-    form_fields_map: Signal<HashMap<String, RegisterFormField>>,
+    form_fields_map: Signal<HashMap<String, GeneralFormField>>,
     all_reqs_fulfilled: Signal<bool>,
     on_register: Action<NewUser, ()>,
 ) -> impl IntoView {

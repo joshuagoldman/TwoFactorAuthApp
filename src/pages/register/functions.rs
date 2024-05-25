@@ -9,15 +9,15 @@ use crate::{
         EMAIL_FIELD_STR, FIRST_NAME_FIELD_STR, LAST_NAME_FIELD_STR, PASSWORD_FIELD_STR,
         REPEAT_PASSWORD_FIELD_STR, USER_NAME_FIELD_STR,
     },
-    misc::{RegisterFormField, Requirement},
+    misc::{GeneralFormField, Requirement},
 };
 
 pub fn all_reqs_fulfilled_func(
-    reg_form_fields_signal: Signal<Vec<RegisterFormField>>,
+    reg_form_fields_signal: Signal<Vec<GeneralFormField>>,
     error_fields_signal: Signal<Vec<String>>,
 ) -> Signal<bool> {
     Signal::derive(move || {
-        let password_fields: Vec<RegisterFormField> = reg_form_fields_signal
+        let password_fields: Vec<GeneralFormField> = reg_form_fields_signal
             .get()
             .into_iter()
             .filter(|form_field| form_field.is_password)
@@ -41,7 +41,7 @@ pub fn all_reqs_fulfilled_func(
 
 pub fn on_register_click(
     all_reqs_fulfilled: Signal<bool>,
-    form_fields_map: HashMap<String, RegisterFormField>,
+    form_fields_map: HashMap<String, GeneralFormField>,
     on_register: Action<NewUser, ()>,
 ) {
     if all_reqs_fulfilled.get() {
@@ -93,27 +93,27 @@ pub fn get_register_form_fields(
     email: RwSignal<String>,
     password_field: RwSignal<String>,
     password_field_repeat: RwSignal<String>,
-) -> Vec<RegisterFormField> {
+) -> Vec<GeneralFormField> {
     vec![
-        RegisterFormField {
+        GeneralFormField {
             name: USER_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: user_name,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: FIRST_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: first_name,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: LAST_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: last_name,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: EMAIL_FIELD_STR.clone(),
             requirement: Some(Requirement {
                 func: Rc::new(move |str_val| return str_val == &"joshuagoldman94@gmail.com"),
@@ -122,13 +122,13 @@ pub fn get_register_form_fields(
             is_password: false,
             signal: email,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: PASSWORD_FIELD_STR.clone(),
             requirement: None,
             is_password: true,
             signal: password_field,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: REPEAT_PASSWORD_FIELD_STR.to_string(),
             requirement: None,
             is_password: true,
@@ -137,7 +137,7 @@ pub fn get_register_form_fields(
     ]
 }
 
-pub fn get_form_fields_signals() -> (Signal<Vec<RegisterFormField>>, Signal<Vec<String>>) {
+pub fn get_form_fields_signals() -> (Signal<Vec<GeneralFormField>>, Signal<Vec<String>>) {
     let user_name = create_rw_signal(String::new());
     let first_name = create_rw_signal(String::new());
     let last_name = create_rw_signal(String::new());

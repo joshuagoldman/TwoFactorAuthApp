@@ -35,3 +35,15 @@ lazy_static! {
 lazy_static! {
     pub static ref REPEAT_PASSWORD_FIELD_STR: String = "Repeat Password".to_string();
 }
+
+lazy_static! {
+    pub static ref CURRENT_PASSWORD_FIELD_STR: String = "Current Password".to_string();
+}
+
+lazy_static! {
+    pub static ref NEW_PASSWORD_FIELD_STR: String = "New Password".to_string();
+}
+
+lazy_static! {
+    pub static ref REPEAT_NEW_PASSWORD_FIELD_STR: String = "Repeat New Password".to_string();
+}

@@ -1,7 +1,6 @@
 use gloo_net::http::{Request, RequestBuilder, Response};
 use qrcode::{EcLevel, QrCode, Version};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use thiserror::Error;
 pub mod api_boundary;
 
 use api_boundary::*;
@@ -166,6 +165,7 @@ impl AuthorizedApi {
 
         ResultHandler::OkResult(ProfileInfo {
             name: "Swag Johnson".to_string(),
+            id: "ss".to_string(),
         })
     }
 
@@ -203,10 +203,6 @@ impl AuthorizedApi {
         //           .pipe_action_async(|response| into_json(response))
         //           .await
 
-        let validate_password_req = ValidatePasswordRequest {
-            password: password.clone(),
-            token: self.token.token.clone(),
-        };
         if password == &"password".to_string() {
             ResultHandler::OkResult(true)
         } else {

@@ -4,21 +4,21 @@ use leptos::{RwSignal, Signal, SignalGet};
 
 use crate::{
     consts::{PASSWORD_FIELD_STR, USER_NAME_FIELD_STR},
-    misc::RegisterFormField,
+    misc::GeneralFormField,
 };
 
 fn get_login_fields(
     user_name: RwSignal<String>,
     password_field: RwSignal<String>,
-) -> Vec<RegisterFormField> {
+) -> Vec<GeneralFormField> {
     vec![
-        RegisterFormField {
+        GeneralFormField {
             name: USER_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: user_name,
         },
-        RegisterFormField {
+        GeneralFormField {
             name: PASSWORD_FIELD_STR.clone(),
             requirement: None,
             is_password: true,
@@ -31,9 +31,9 @@ pub fn get_login_form_signals(
     user_name: RwSignal<String>,
     password_field: RwSignal<String>,
 ) -> (
-    Signal<Vec<RegisterFormField>>,
+    Signal<Vec<GeneralFormField>>,
     Signal<Vec<String>>,
-    Signal<HashMap<String, RegisterFormField>>,
+    Signal<HashMap<String, GeneralFormField>>,
 ) {
     let login_form_fields = get_login_fields(user_name, password_field);
 
@@ -46,7 +46,7 @@ pub fn get_login_form_signals(
     let error_messages_signal = get_login_error_fields(user_name, password_field);
 
     let login_fields_map_signal = Signal::derive(move || {
-        let mut form_fields_map: HashMap<String, RegisterFormField> = HashMap::new();
+        let mut form_fields_map: HashMap<String, GeneralFormField> = HashMap::new();
 
         for (_, field) in get_login_fields(user_name, password_field)
             .iter()
