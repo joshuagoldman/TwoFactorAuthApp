@@ -64,7 +64,7 @@ pub fn App() -> impl IntoView {
     let auth_view_func_reset = move |authorized_api: AuthorizedApi| {
         view! {
             <PasswordVerification authorized_api
-                  action_type= pages::password_verification::functions::PassVerificationAction::ResetPassword
+                  action_type= pages::password_verification::misc::PassVerificationAction::ResetPassword
             />
         }
     };
@@ -73,7 +73,7 @@ pub fn App() -> impl IntoView {
     let auth_view_func_delete = move |authorized_api: AuthorizedApi| {
         view! {
             <PasswordVerification authorized_api
-                  action_type= pages::password_verification::functions::PassVerificationAction::DeleteAccount
+                  action_type= pages::password_verification::misc::PassVerificationAction::DeleteAccount
             />
         }
     };
