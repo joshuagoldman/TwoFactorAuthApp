@@ -5,12 +5,16 @@ use crate::{
     components::{
         fields_error::TextFieldErrors, password_verification_form::PasswordVerificationForm,
     },
-    pages::password_verification::functions::{
-        get_action_to_perform, get_action_to_perform_title, get_is_action_enabled_signal,
-        get_page_title, get_password_verification_form_signals, PassVerificationAction,
-        PassVerificationActionData,
+    pages::password_verification::{
+        misc::{
+            get_action_to_perform, get_action_to_perform_title, get_is_action_enabled_signal,
+            get_page_title, PassVerificationActionData,
+        },
+        pass_verification_field_signals::get_password_verification_form_signals,
     },
 };
+
+use super::misc::PassVerificationAction;
 
 #[component]
 pub fn PasswordVerification(
@@ -78,7 +82,7 @@ pub fn PasswordVerification(
 
                             <form class="mx-1 mx-md-4">
                                 <Show
-                                    when= move  || !is_loading.get() || is_success.get()
+                                    when= move  || !is_loading.get()
                                     fallback= move || view! {
                                         <div>{move || format!("Performing {}", action_name.get())}</div>
                                     }

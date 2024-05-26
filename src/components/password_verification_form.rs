@@ -25,10 +25,10 @@ pub fn PasswordVerificationForm(
             }
         >
 
-            <AllLoginFields login_fields_map_signal></AllLoginFields>
+            <AllPasswordVerificationFields login_fields_map_signal></AllPasswordVerificationFields>
             <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                 <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
-                            disabled= {move || action_enabled.get()}
+                            disabled= {move || !action_enabled.get()}
                             on:click= {move |_| action_to_perform.dispatch(())}
                 >{move || action_name.get()}</button>
             </div>
@@ -37,7 +37,7 @@ pub fn PasswordVerificationForm(
 }
 
 #[component]
-pub fn AllLoginFields(
+pub fn AllPasswordVerificationFields(
     login_fields_map_signal: Signal<HashMap<String, GeneralFormField>>,
 ) -> impl IntoView {
     let current_pass_field_signal = Signal::derive(move || {
