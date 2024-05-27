@@ -164,7 +164,7 @@ impl AuthorizedApi {
         //res
 
         ResultHandler::OkResult(ProfileInfo {
-            name: "Swag Johnson".to_string(),
+            name: "John Johnson".to_string(),
             id: "ss".to_string(),
         })
     }
@@ -187,7 +187,7 @@ impl AuthorizedApi {
             curr_password: new_password.clone(),
             token: self.token.token.clone(),
         };
-        if password != &"password".to_string() {
+        if password == &"password".to_string() {
             ResultHandler::OkResult(true)
         } else {
             ResultHandler::ErrResult("Reset of password failed".to_string())
@@ -204,6 +204,10 @@ impl AuthorizedApi {
         //           .await
 
         if password == &"password".to_string() {
+            let validate_password_req = ValidatePasswordRequest {
+                password: password.clone(),
+                token: self.token.token.clone(),
+            };
             ResultHandler::OkResult(true)
         } else {
             ResultHandler::ErrResult("Wrong password".to_string())

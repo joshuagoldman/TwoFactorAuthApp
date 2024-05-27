@@ -1,10 +1,11 @@
 pub mod home;
 pub mod login;
 pub mod otp;
+pub mod page_not_found;
 pub mod password_verification;
 pub mod register;
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq)]
 pub enum Page {
     #[default]
     Home,

@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Duration};
+use std::{collections::HashMap, rc::Rc, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
@@ -18,6 +18,27 @@ use crate::{
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
     pages::Page,
 };
+
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub enum ApiState {
+    #[default]
+    UnAuth,
+    Otp,
+    Auth,
+}
+
+impl ApiState {
+    fn to_string(&self) -> String {
+        match self {
+            ApiState::UnAuth => "UnAuth".to_string(),
+            ApiState::Otp => "Otp".to_string(),
+            ApiState::Auth => "Auth".to_string(),
+        }
+    }
+    pub fn compare(&self, compare_val: Self) -> bool {
+        self.to_string() == compare_val.to_string()
+    }
+}
 
 #[derive(Clone)]
 pub struct Requirement {
@@ -68,7 +89,47 @@ pub fn log_out() {
     navigate(Page::Login.path(), Default::default());
 }
 
-pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
+pub fn get_api_state_by_page_map() -> HashMap<Page, ApiState> {
+    let mut api_state_page_map: HashMap<Page, ApiState> = HashMap::new();
+
+    let unauth_pages = vec![Page::Login, Page::Register];
+    let otp_pages = vec![Page::OtpValidation];
+    let auth_pages = vec![Page::Home, Page::Reset, Page::Delete];
+
+    for (_, page) in unauth_pages.iter().enumerate() {
+        api_state_page_map.insert(page.clone(), ApiState::UnAuth);
+    }
+    for (_, page) in otp_pages.iter().enumerate() {
+        api_state_page_map.insert(page.clone(), ApiState::Otp);
+    }
+    for (_, page) in auth_pages.iter().enumerate() {
+        api_state_page_map.insert(page.clone(), ApiState::Auth);
+    }
+
+    api_state_page_map
+}
+
+pub fn is_move_to_default_page(page: Page, api_state: ApiState) -> Option<Page> {
+    let api_state_page_map = get_api_state_by_page_map();
+
+    let default_page = match api_state {
+        ApiState::UnAuth => Page::Login,
+        ApiState::Otp => Page::OtpValidation,
+        ApiState::Auth => Page::Home,
+    };
+
+    if let Some(page_actual_api_state) = api_state_page_map.get(&page) {
+        if page_actual_api_state.compare(api_state) {
+            None
+        } else {
+            Some(default_page)
+        }
+    } else {
+        Some(default_page)
+    }
+}
+
+pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page) {
     console_log(
         format!(
             "{:>?}",
@@ -83,7 +144,6 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
         )
         .as_str(),
     );
-    task::sleep(Duration::from_secs(2)).await;
     if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.clone()) {
         let api = api::AuthorizedApi::new(&DEFAULT_API_URL, token);
         match api.has_expired().await {
@@ -94,7 +154,12 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
                     api_set_signals
                         .auth
                         .update(|api_curr| *api_curr = Some(api));
-                    go_to_page(crate::pages::Page::Home);
+                    if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::Auth)
+                    {
+                        task::sleep(Duration::from_secs(2)).await;
+                        go_to_page(defaut_page);
+                        return;
+                    }
                 }
             }
             ResultHandler::ErrResult(err_message) => {
@@ -111,9 +176,11 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
                     api_set_signals
                         .otpauth
                         .update(|api_curr| *api_curr = Some(api));
-                    go_to_page(crate::pages::Page::OtpValidation);
-                    api_set_signals.is_resolved.update(|x| *x = true);
-                    return;
+                    if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::Otp) {
+                        task::sleep(Duration::from_secs(2)).await;
+                        go_to_page(defaut_page);
+                        return;
+                    }
                 }
             }
             ResultHandler::ErrResult(err_message) => {
@@ -125,14 +192,28 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals) {
         api_set_signals
             .unauth
             .update(|api_curr| *api_curr = Some(api));
+        if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::UnAuth) {
+            task::sleep(Duration::from_secs(2)).await;
+            go_to_page(defaut_page);
+            return;
+        }
     }
     api_set_signals.is_resolved.update(|x| *x = true);
 }
 
 #[derive(Clone)]
+pub struct ApiStateViewInfo<F>
+where
+    F: IntoView + 'static + Clone,
+{
+    pub page: Page,
+    pub view: ApiStateView<F>,
+}
+
+#[derive(Clone)]
 pub enum ApiStateView<F>
 where
-    F: IntoView + 'static,
+    F: IntoView + 'static + Clone,
 {
     UnAuth(Rc<dyn Fn(UnauthorizedApi) -> F>),
     OTPAuth(
@@ -146,18 +227,19 @@ where
 }
 
 #[component]
-pub fn ApiStateCheckView<F>(view: ApiStateView<F>) -> impl IntoView
+pub fn ApiStateCheckView<F>(view_info: ApiStateViewInfo<F>) -> impl IntoView
 where
     F: IntoView + 'static + Clone,
 {
     let api_signals = ApiSignals::new();
-    let check_logged_in =
-        create_action(|api_set_signals: &ApiSignals| check_user_logged_in(api_set_signals.clone()));
+    let check_logged_in = create_action(move |api_set_signals: &ApiSignals| {
+        check_user_logged_in(api_set_signals.clone(), view_info.page)
+    });
 
     check_logged_in.dispatch(api_signals);
 
     let view_signal = Signal::derive(move || {
-        let view = match view.clone() {
+        let view = match view_info.view.clone() {
             ApiStateView::UnAuth(view_func_unauth) => {
                 if let Some(unauth_api) = api_signals.unauth.get() {
                     view_func_unauth(unauth_api)

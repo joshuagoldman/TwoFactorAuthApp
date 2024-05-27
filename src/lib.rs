@@ -1,83 +1,32 @@
-use std::rc::Rc;
-
-use api::AuthorizedApi;
 use leptos::component;
 use leptos::*;
 use leptos_router::*;
 
 mod api;
+mod api_state_handling;
+mod api_state_view_infos;
 mod components;
 mod consts;
 mod misc;
 mod pages;
 
-use crate::api::api_boundary::ProfileInfo;
-use crate::api::OtpAuthorizedApi;
+use crate::api_state_view_infos::{
+    get_delete_view, get_home_view, get_login_view, get_otp_view, get_register_view,
+    get_reset_view, get_unauth_view,
+};
 use crate::misc::ApiStateCheckView;
-use crate::pages::home::Home;
-use crate::pages::login::view::Login;
-use crate::pages::otp::Otp;
-use crate::pages::password_verification::view::PasswordVerification;
-use crate::pages::register::view::Register;
+use crate::pages::page_not_found::PageNotFound;
 use crate::pages::Page;
 
 #[component]
 pub fn App() -> impl IntoView {
-    let unauth_view_func = move |unauth_api: api::UnauthorizedApi| {
-        view! {
-            <Login unauth_api
-            />
-        }
-    };
-    let unauth_view_func = Rc::new(unauth_view_func);
-
-    let register_view_func = move |unatuhorized_api: api::UnauthorizedApi| {
-        view! {
-            <Register unatuhorized_api
-            />
-        }
-    };
-    let register_view_func = Rc::new(register_view_func);
-
-    let otp_auth_view_func = move |otp_auth_api: OtpAuthorizedApi| {
-        view! {
-            <Otp otp_auth_api ></Otp>
-        }
-        .into_view()
-    };
-    let otp_auth_view_func = Rc::new(otp_auth_view_func);
-
-    let profile_info: RwSignal<Option<ProfileInfo>> = create_rw_signal(None);
-    let auth_view_func = move |authorized_api: AuthorizedApi| {
-        view! {
-            <Home authorized_api
-                  profile_info
-            />
-        }
-    };
-    let auth_view_func = Rc::new(auth_view_func);
-    let unauth_view_func_login = unauth_view_func.clone();
-    let unauth_view_func_home = unauth_view_func.clone();
-    let unauth_view_func_reset = unauth_view_func.clone();
-    let unauth_view_func_delete = unauth_view_func.clone();
-
-    let auth_view_func_reset = move |authorized_api: AuthorizedApi| {
-        view! {
-            <PasswordVerification authorized_api
-                  action_type= pages::password_verification::misc::PassVerificationAction::ResetPassword
-            />
-        }
-    };
-    let auth_view_func_reset = Rc::new(auth_view_func_reset);
-
-    let auth_view_func_delete = move |authorized_api: AuthorizedApi| {
-        view! {
-            <PasswordVerification authorized_api
-                  action_type= pages::password_verification::misc::PassVerificationAction::DeleteAccount
-            />
-        }
-    };
-    let auth_view_func_delete = Rc::new(auth_view_func_delete);
+    let unauth_view_func = get_unauth_view();
+    let login_view_info = get_login_view();
+    let register_view_info = get_register_view();
+    let otp_view_info = get_otp_view(unauth_view_func.clone());
+    let home_view_info = get_home_view(unauth_view_func.clone());
+    let reset_view_info = get_reset_view(unauth_view_func.clone());
+    let delete_view_info = get_delete_view(unauth_view_func.clone());
 
     view! {
         <Router>
@@ -87,9 +36,7 @@ pub fn App() -> impl IntoView {
                         path=Page::Reset.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::Auth(unauth_view_func_delete.clone(),
-                                                                auth_view_func_delete.clone())
-                            />
+                                view_info = reset_view_info.clone()/>
                         }
 
                   />
@@ -97,9 +44,7 @@ pub fn App() -> impl IntoView {
                         path=Page::Delete.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::Auth(unauth_view_func_reset.clone(),
-                                                                auth_view_func_reset.clone())
-                            />
+                                view_info = delete_view_info.clone()/>
                         }
 
                   />
@@ -107,8 +52,7 @@ pub fn App() -> impl IntoView {
                         path=Page::Register.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::UnAuth(register_view_func.clone())
-                            />
+                                view_info = register_view_info.clone()/>
                         }
 
                   />
@@ -116,8 +60,7 @@ pub fn App() -> impl IntoView {
                         path=Page::Login.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::UnAuth(unauth_view_func_login.clone())
-                            />
+                                view_info = login_view_info.clone()/>
                         }
 
                   />
@@ -125,9 +68,7 @@ pub fn App() -> impl IntoView {
                         path=Page::OtpValidation.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::OTPAuth(unauth_view_func.clone(),
-                                                                  otp_auth_view_func.clone())
-                            />
+                                view_info = otp_view_info.clone()/>
                         }
 
                   />
@@ -135,11 +76,14 @@ pub fn App() -> impl IntoView {
                         path=Page::Home.path().to_string().clone()
                         view= move || view! {
                             <ApiStateCheckView
-                                view = misc::ApiStateView::Auth(unauth_view_func_home.clone(),
-                                                                  auth_view_func.clone())
-                            />
+                                view_info = home_view_info.clone()/>
                         }
-
+                  />
+                  <Route
+                        path="*any"
+                        view= move || view! {
+                            <PageNotFound/>
+                        }
                   />
                 </Routes>
             </main>

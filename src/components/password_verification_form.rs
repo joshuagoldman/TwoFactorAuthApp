@@ -14,7 +14,7 @@ pub fn PasswordVerificationForm(
     action_enabled: Signal<bool>,
     action_name: Signal<String>,
     is_success: Signal<bool>,
-    action_to_perform: Action<(), ()>,
+    action_to_perform: Signal<Action<(), ()>>,
 ) -> impl IntoView {
     view! {
 
@@ -29,7 +29,7 @@ pub fn PasswordVerificationForm(
             <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                 <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
                             disabled= {move || !action_enabled.get()}
-                            on:click= {move |_| action_to_perform.dispatch(())}
+                            on:click= {move |_| action_to_perform.get().dispatch(())}
                 >{move || action_name.get()}</button>
             </div>
         </Show>

@@ -117,15 +117,22 @@ pub fn get_action_to_perform_title(
 pub fn get_action_to_perform(
     pass_verification_data: PassVerificationActionData,
     action_to_perform: PassVerificationAction,
-) -> Action<(), ()> {
-    if pass_verification_data.is_enter_current_passwrd.get() {
-        get_verify_password_action(pass_verification_data)
-    } else {
-        match action_to_perform {
-            PassVerificationAction::ResetPassword => reset_action(pass_verification_data),
-            PassVerificationAction::DeleteAccount => delete_account_action(pass_verification_data),
+) -> Signal<Action<(), ()>> {
+    let pass_verification_data = pass_verification_data.clone();
+    Signal::derive(move || {
+        if pass_verification_data.is_enter_current_passwrd.get() {
+            get_verify_password_action(pass_verification_data.clone())
+        } else {
+            match action_to_perform {
+                PassVerificationAction::ResetPassword => {
+                    reset_action(pass_verification_data.clone())
+                }
+                PassVerificationAction::DeleteAccount => {
+                    delete_account_action(pass_verification_data.clone())
+                }
+            }
         }
-    }
+    })
 }
 
 pub fn set_signal_state_to_init(pass_verification_data: PassVerificationActionData) {

@@ -46,7 +46,17 @@ pub fn Home(
         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
             <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
                         on:click= {move |_| misc::log_out() }
-            >Login</button>
+            >Log Out</button>
+        </div>
+        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+            <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                        on:click= {move |_| misc::go_to_page(crate::pages::Page::Reset) }
+            >Reset Password</button>
+        </div>
+        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+            <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                        on:click= {move |_| misc::go_to_page(crate::pages::Page::Delete) }
+            >Delete Account</button>
         </div>
     }
 }
