@@ -55,7 +55,6 @@ pub struct TokenResponse {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ResetPasswordRequest {
     pub new_password: String,
-    pub curr_password: String,
     pub token: String,
 }
 

@@ -171,7 +171,7 @@ impl AuthorizedApi {
 
     pub async fn reset_password(
         &self,
-        password: &String,
+        token: &ApiToken,
         new_password: &String,
     ) -> ResultHandler<bool> {
         //       let url = format!("{}/login", self.url);
@@ -183,11 +183,10 @@ impl AuthorizedApi {
         //           .await
 
         let validate_password_req = ResetPasswordRequest {
-            new_password: password.clone(),
-            curr_password: new_password.clone(),
+            new_password: new_password.clone(),
             token: self.token.token.clone(),
         };
-        if password == &"password".to_string() {
+        if new_password == &"password".to_string() {
             ResultHandler::OkResult(true)
         } else {
             ResultHandler::ErrResult("Reset of password failed".to_string())

@@ -101,7 +101,7 @@ pub fn get_password_verification_error_fields(
             new_password_signal,
             new_password_repeat_signal,
         );
-        let errors = reg_form_fields
+        let mut errors = reg_form_fields
             .iter()
             .filter(|x| is_allowed_field(action_type.clone(), x, is_verification_mode))
             .map(|x| {
@@ -129,6 +129,14 @@ pub fn get_password_verification_error_fields(
             .filter(|x| x.is_some())
             .map(|x| x.unwrap())
             .collect::<Vec<String>>();
+
+        if !is_verification_mode.get()
+            && !new_password_signal.get().is_empty()
+            && !new_password_repeat_signal.get().is_empty()
+            && new_password_signal.get() != new_password_repeat_signal.get()
+        {
+            errors.push("Passwords are not equal".to_string());
+        }
 
         errors
     })

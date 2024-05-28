@@ -1,4 +1,7 @@
-use leptos::{component, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet};
+use leptos::{
+    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, IntoView,
+    RwSignal, Show, Signal, SignalGet, SignalUpdate,
+};
 
 use crate::{
     api::{api_boundary::ResultHandler, AuthorizedApi},
@@ -24,7 +27,7 @@ pub fn PasswordVerification(
     let result: RwSignal<Option<ResultHandler<String>>> = create_rw_signal(None);
     let is_verification_mode = create_rw_signal(true);
     let is_loading = create_rw_signal(false);
-    let page_title = get_page_title(is_verification_mode);
+    let page_title = get_page_title(action_type.clone());
     let current_password_signal = create_rw_signal(String::new());
     let new_password_signal = create_rw_signal(String::new());
     let new_password_repeat_signal = create_rw_signal(String::new());
@@ -69,6 +72,10 @@ pub fn PasswordVerification(
         _ => false,
     });
 
+    let additional_form_action = create_action(move |_| async move {
+        result.update(|x| *x = None);
+    });
+
     view! {
         <div class="container">
             <div class="row d-flex justify-content-center align-items-center">
@@ -77,10 +84,10 @@ pub fn PasswordVerification(
                         <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
                             <Show
-                                when= {move || is_loading.get()}
+                                when= {move || !is_loading.get()}
                                 fallback= move || view! { <div></div>}
                             >
-                                <p class="text-center h3 fw-bold mb-2 mx-1 mx-md-4 mt-4">{move || page_title.get()}</p>
+                                <p class="text-center h3 fw-bold mb-2 mx-1 mx-md-4 mt-4">{page_title.clone()}</p>
                             </Show>
 
                             <form class="mx-1 mx-md-4">
@@ -96,23 +103,24 @@ pub fn PasswordVerification(
                                         action_name
                                         is_success
                                         action_to_perform
+                                        additional_form_action
                                    ></PasswordVerificationForm>
                                 </Show>
                                 <TextFieldErrors
                                     error_fields_signal
                                 >
                                 </TextFieldErrors>
+                                <Show
+                                    when= move  || result.get().is_some()
+                                    fallback= move || view! { <div></div>}
+                                >
+                                <ActionResult
+                                    result=result.get()
+                                    current_password_signal
+                                ></ActionResult>
+                                </Show>
                             </form>
                         </div>
-                        <Show
-                            when= move  || result.get().is_some()
-                            fallback= move || view! { <div></div>}
-                        >
-                           <ActionResult
-                             login_result=result.get()
-                             current_password_signal
-                           ></ActionResult>
-                        </Show>
                     </div>
                 </div>
             </div>
@@ -122,12 +130,13 @@ pub fn PasswordVerification(
 
 #[component]
 fn ActionResult(
-    login_result: Option<ResultHandler<String>>,
+    result: Option<ResultHandler<String>>,
     current_password_signal: RwSignal<String>,
 ) -> impl IntoView {
     view! {
         {move || {
-            let login_result = login_result.clone();
+            let login_result = result.clone();
+            console_log("came here");
             if current_password_signal.get().is_empty() {
 
                 match login_result.unwrap_or(ResultHandler::OkResult(String::new())) {

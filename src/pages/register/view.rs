@@ -54,6 +54,10 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
 
     let all_reqs_fulfilled = all_reqs_fulfilled_func(form_fields, error_fields_signal);
 
+    let additional_form_action = create_action(move |_| async move {
+        error_message.update(|x| *x = None);
+    });
+
     view! {
         <div class="container">
             <div class="row d-flex justify-content-center align-items-center">
@@ -79,6 +83,7 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
                                         form_fields_map= form_fields_map_signal
                                         all_reqs_fulfilled
                                         on_register
+                                        additional_form_action
                                     >
                                     </RegisterFields>
                                 </Show>
@@ -120,10 +125,12 @@ fn RegisterFields(
     form_fields_map: Signal<HashMap<String, GeneralFormField>>,
     all_reqs_fulfilled: Signal<bool>,
     on_register: Action<NewUser, ()>,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     view! {
 
-        <AllRegisterFields form_fields_map></AllRegisterFields>
+        <AllRegisterFields form_fields_map
+                           additional_form_action></AllRegisterFields>
         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
             <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
                         disabled= {move || !all_reqs_fulfilled.get()}

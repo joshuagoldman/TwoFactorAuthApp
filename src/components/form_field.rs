@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use leptos::{
-    component, ev, event_target_value, view, IntoView, Signal, SignalGet, SignalUpdate, View,
+    component, ev, event_target_value, view, Action, IntoView, Signal, SignalGet, SignalUpdate,
+    View,
 };
 
 use crate::{
@@ -15,16 +16,26 @@ use crate::{
 #[component]
 pub fn AllRegisterFields(
     form_fields_map: Signal<HashMap<String, GeneralFormField>>,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     view! {
-        <TextFields form_fields_map></TextFields>
-        <PasswordFields form_fields_map></PasswordFields>
-        <EmailField form_fields_map></EmailField>
+        <TextFields form_fields_map
+                    additional_form_action>
+        </TextFields>
+        <PasswordFields form_fields_map
+                        additional_form_action>
+        </PasswordFields>
+        <EmailField form_fields_map
+                    additional_form_action>
+        </EmailField>
     }
 }
 
 #[component]
-pub fn TextFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
+pub fn TextFields(
+    form_fields_map: Signal<HashMap<String, GeneralFormField>>,
+    additional_form_action: Action<(), ()>,
+) -> impl IntoView {
     let text_fields_signal = Signal::derive(move || {
         vec![
             form_fields_map
@@ -51,7 +62,8 @@ pub fn TextFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) ->
                 .into_iter()
                 .map(|form_field| {
                     view! {
-                        <FormField form_field/>
+                        <FormField form_field
+                                   additional_form_action/>
                     }
                 })
                 .collect::<Vec<View>>()
@@ -61,7 +73,10 @@ pub fn TextFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) ->
 }
 
 #[component]
-pub fn PasswordFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
+pub fn PasswordFields(
+    form_fields_map: Signal<HashMap<String, GeneralFormField>>,
+    additional_form_action: Action<(), ()>,
+) -> impl IntoView {
     let password_fields_signal = Signal::derive(move || {
         vec![
             form_fields_map
@@ -83,7 +98,8 @@ pub fn PasswordFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>
                 .into_iter()
                 .map(|form_field| {
                     view! {
-                        <FormField form_field/>
+                        <FormField form_field
+                                   additional_form_action/>
                     }
                 })
                 .collect::<Vec<View>>()
@@ -93,7 +109,10 @@ pub fn PasswordFields(form_fields_map: Signal<HashMap<String, GeneralFormField>>
 }
 
 #[component]
-pub fn EmailField(form_fields_map: Signal<HashMap<String, GeneralFormField>>) -> impl IntoView {
+pub fn EmailField(
+    form_fields_map: Signal<HashMap<String, GeneralFormField>>,
+    additional_form_action: Action<(), ()>,
+) -> impl IntoView {
     let email_field_signal = Signal::derive(move || {
         form_fields_map
             .get()
@@ -103,12 +122,16 @@ pub fn EmailField(form_fields_map: Signal<HashMap<String, GeneralFormField>>) ->
     });
 
     view! {
-        <FormField form_field= email_field_signal.get()/>
+        <FormField form_field= email_field_signal.get()
+                   additional_form_action/>
     }
 }
 
 #[component]
-pub fn FormField(form_field: GeneralFormField) -> impl IntoView {
+pub fn FormField(
+    form_field: GeneralFormField,
+    additional_form_action: Action<(), ()>,
+) -> impl IntoView {
     let form_type = if form_field.is_password {
         "password"
     } else {
@@ -138,6 +161,7 @@ pub fn FormField(form_field: GeneralFormField) -> impl IntoView {
                                 }
                                 _=> {
                                     let val = event_target_value(&ev);
+                                    additional_form_action.dispatch(());
                                     form_field.signal.update(|p|*p = val);
                                 }
                         }}

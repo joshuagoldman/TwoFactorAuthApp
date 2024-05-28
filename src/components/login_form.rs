@@ -13,10 +13,13 @@ pub fn LoginForm(
     login_fields_map_signal: Signal<HashMap<String, GeneralFormField>>,
     credentials: Signal<Option<Credentials>>,
     on_login: Action<Credentials, ()>,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     view! {
 
-        <AllLoginFields login_fields_map_signal></AllLoginFields>
+        <AllLoginFields login_fields_map_signal
+                        additional_form_action>
+        </AllLoginFields>
         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
             <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
                         disabled= {move || credentials.get().is_none()}
@@ -29,6 +32,7 @@ pub fn LoginForm(
 #[component]
 pub fn AllLoginFields(
     login_fields_map_signal: Signal<HashMap<String, GeneralFormField>>,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     let username_field_signal = Signal::derive(move || {
         login_fields_map_signal
@@ -46,7 +50,9 @@ pub fn AllLoginFields(
     });
 
     view! {
-        <FormField form_field= username_field_signal.get()/>
-        <FormField form_field= password_field_signal.get()/>
+        <FormField form_field= username_field_signal.get()
+                   additional_form_action/>
+        <FormField form_field= password_field_signal.get()
+                   additional_form_action/>
     }
 }

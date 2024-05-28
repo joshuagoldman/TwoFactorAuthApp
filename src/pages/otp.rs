@@ -12,7 +12,7 @@ use regex::Regex;
 use crate::{
     api::{api_boundary::ResultHandler, OtpAuthorizedApi},
     components::{fields_error::TextFieldErrors, otp_field::OtpField},
-    consts::API_TOKEN_STORAGE_KEY,
+    consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY},
     misc,
     pages::Page,
 };
@@ -104,6 +104,7 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
             task::sleep(Duration::from_secs(2)).await;
             match otp_auth_api.check_otp(&otp).await {
                 ResultHandler::OkResult(ok_res) => {
+                    LocalStorage::delete(API_TOKEN_OTP_KEY.clone());
                     LocalStorage::set(API_TOKEN_STORAGE_KEY.clone(), ok_res.token.clone()).unwrap();
                     misc::go_to_page(Page::Home);
                 }
@@ -119,6 +120,10 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
             }
             is_verifying_otp.update(|x| *x = false);
         }
+    });
+
+    let additional_form_action = create_action(move |_| async move {
+        err_msg.update(|x| *x = None);
     });
 
     view! {
@@ -138,12 +143,12 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
 
                             <form class="mx-1 mx-md-4">
                                 <div class="otp-field mb-1">
-                                    <OtpField otp_field_val=otp_num_1_signal></OtpField>
-                                    <OtpField otp_field_val=otp_num_2_signal></OtpField>
-                                    <OtpField otp_field_val=otp_num_3_signal></OtpField>
-                                    <OtpField otp_field_val=otp_num_4_signal></OtpField>
-                                    <OtpField otp_field_val=otp_num_5_signal></OtpField>
-                                    <OtpField otp_field_val=otp_num_6_signal></OtpField>
+                                    <OtpField otp_field_val=otp_num_1_signal additional_form_action></OtpField>
+                                    <OtpField otp_field_val=otp_num_2_signal additional_form_action></OtpField>
+                                    <OtpField otp_field_val=otp_num_3_signal additional_form_action></OtpField>
+                                    <OtpField otp_field_val=otp_num_4_signal additional_form_action></OtpField>
+                                    <OtpField otp_field_val=otp_num_5_signal additional_form_action></OtpField>
+                                    <OtpField otp_field_val=otp_num_6_signal additional_form_action></OtpField>
                                 </div>
 
                                 <button class="btn btn-primary mb-3"

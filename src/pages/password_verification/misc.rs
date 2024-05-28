@@ -73,8 +73,15 @@ pub fn is_allowed_field(
                     || curr_field.name == REPEAT_NEW_PASSWORD_FIELD_STR.to_string())
             {
                 false
-            } else {
+            } else if !is_verification_mode.get()
+                && (curr_field.name == NEW_PASSWORD_FIELD_STR.to_string()
+                    || curr_field.name == REPEAT_NEW_PASSWORD_FIELD_STR.to_string())
+            {
                 true
+            } else if is_verification_mode.get() {
+                true
+            } else {
+                false
             }
         }
         PassVerificationAction::DeleteAccount => {
@@ -82,21 +89,20 @@ pub fn is_allowed_field(
                 || curr_field.name == REPEAT_NEW_PASSWORD_FIELD_STR.to_string()
             {
                 false
-            } else {
+            } else if is_verification_mode.get() {
                 true
+            } else {
+                false
             }
         }
     }
 }
 
-pub fn get_page_title(is_enter_current_passwrd: RwSignal<bool>) -> Signal<String> {
-    Signal::derive(move || {
-        if is_enter_current_passwrd.get() {
-            "Current password".to_string()
-        } else {
-            "New password".to_string()
-        }
-    })
+pub fn get_page_title(action_to_perform: PassVerificationAction) -> String {
+    match action_to_perform {
+        PassVerificationAction::ResetPassword => "Reset Password".to_string(),
+        PassVerificationAction::DeleteAccount => "Delete Account".to_string(),
+    }
 }
 
 pub fn get_action_to_perform_title(
@@ -105,11 +111,11 @@ pub fn get_action_to_perform_title(
 ) -> Signal<String> {
     Signal::derive(move || {
         if is_verification_mode.get() {
-            "Verify Password".to_string()
+            "password verification...".to_string()
         } else {
             match action_to_perform {
-                PassVerificationAction::ResetPassword => "Reset Password".to_string(),
-                PassVerificationAction::DeleteAccount => "Delete Account".to_string(),
+                PassVerificationAction::ResetPassword => "Password reset...".to_string(),
+                PassVerificationAction::DeleteAccount => "account deletion...".to_string(),
             }
         }
     })
@@ -121,13 +127,21 @@ pub fn get_action_to_perform(
 ) -> Signal<Action<(), ()>> {
     let pass_verification_data = pass_verification_data.clone();
     Signal::derive(move || {
-        if pass_verification_data.is_enter_current_passwrd.get() {
-            get_verify_password_action(pass_verification_data.clone())
+        if pass_verification_data
+            .clone()
+            .is_enter_current_passwrd
+            .get()
+        {
+            get_verify_password_action(
+                pass_verification_data.clone(),
+                pass_verification_data.current_password_signal.get(),
+            )
         } else {
             match action_to_perform {
-                PassVerificationAction::ResetPassword => {
-                    reset_action(pass_verification_data.clone())
-                }
+                PassVerificationAction::ResetPassword => reset_action(
+                    pass_verification_data.clone(),
+                    pass_verification_data.new_password_signal.get(),
+                ),
                 PassVerificationAction::DeleteAccount => {
                     delete_account_action(pass_verification_data.clone())
                 }
@@ -152,6 +166,18 @@ pub fn set_signal_state_to_init(pass_verification_data: PassVerificationActionDa
     pass_verification_data
         .is_loading
         .update(|upd: &mut bool| *upd = false);
+}
+
+pub fn verify_password_ok_handle(pass_verification_data: PassVerificationActionData) {
+    pass_verification_data
+        .is_enter_current_passwrd
+        .update(|upd: &mut bool| *upd = false);
+    pass_verification_data
+        .is_loading
+        .update(|upd: &mut bool| *upd = false);
+    pass_verification_data
+        .current_password_signal
+        .update(|x| *x = String::new());
 }
 
 pub async fn ok_result_handle(pass_verification_data: PassVerificationActionData) {

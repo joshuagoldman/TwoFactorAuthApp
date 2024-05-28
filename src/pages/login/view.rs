@@ -3,8 +3,8 @@ use std::time::Duration;
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet,
-    SignalUpdate,
+    component, create_action, create_effect, create_rw_signal, leptos_dom::logging::console_log,
+    view, IntoView, RwSignal, Show, Signal, SignalGet, SignalUpdate, SignalWith,
 };
 
 use crate::{
@@ -68,10 +68,14 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
                     login_error_signal.update(|x| *x = Some(err_msg));
                 }
             }
-            logging_in_signal.update(|upd: &mut bool| *upd = false);
             user_name.update(|x| *x = String::new());
             password_field.update(|x| *x = String::new());
+            logging_in_signal.update(|upd: &mut bool| *upd = false);
         }
+    });
+
+    let additional_form_action = create_action(move |_| async move {
+        login_error_signal.update(|x| *x = None);
     });
 
     view! {
@@ -99,16 +103,12 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
                                     login_fields_map_signal
                                     credentials
                                     on_login
+                                    additional_form_action
                                   >
                                   </LoginForm>
                                 </Show>
-                                <TextFieldErrors
-                                    error_fields_signal
-                                >
-                                </TextFieldErrors>
-                                <LoginError login_error_signal
-                                            credentials_empty_signal
-                                ></LoginError>
+                                <TextFieldErrors error_fields_signal />
+                                <LoginError login_error_signal/>
                             </form>
                         </div>
                     </div>
@@ -119,13 +119,10 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
 }
 
 #[component]
-pub fn LoginError(
-    login_error_signal: RwSignal<Option<String>>,
-    credentials_empty_signal: Signal<bool>,
-) -> impl IntoView {
+pub fn LoginError(login_error_signal: RwSignal<Option<String>>) -> impl IntoView {
     view! {
         <Show
-            when= move  || {login_error_signal.get().is_some() && credentials_empty_signal.get()}
+            when= move  || {login_error_signal.get().is_some()}
             fallback= move || view! { <div></div>}
         >
           <div style="color:red">{move || login_error_signal.get()}</div>

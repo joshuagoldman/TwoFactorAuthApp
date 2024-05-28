@@ -16,6 +16,7 @@ pub fn PasswordVerificationForm(
     action_name: Signal<String>,
     is_success: Signal<bool>,
     action_to_perform: Signal<Action<(), ()>>,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     view! {
 
@@ -26,7 +27,9 @@ pub fn PasswordVerificationForm(
             }
         >
 
-            <AllPasswordVerificationFields pass_verification_data = pass_verification_data.clone()></AllPasswordVerificationFields>
+            <AllPasswordVerificationFields pass_verification_data = pass_verification_data.clone()
+                                           additional_form_action>
+            </AllPasswordVerificationFields>
             <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                 <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
                             disabled= {move || !action_enabled.get()}
@@ -40,6 +43,7 @@ pub fn PasswordVerificationForm(
 #[component]
 pub fn AllPasswordVerificationFields(
     pass_verification_data: PassVerificationActionData,
+    additional_form_action: Action<(), ()>,
 ) -> impl IntoView {
     let allowed_fields = Signal::derive(move || {
         pass_verification_data
@@ -56,7 +60,8 @@ pub fn AllPasswordVerificationFields(
             })
             .map(|form_field| {
                 view! {
-                    <FormField form_field/>
+                    <FormField form_field
+                               additional_form_action/>
                 }
             })
             .collect::<Vec<View>>()
