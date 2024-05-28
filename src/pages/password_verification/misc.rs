@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
@@ -30,6 +30,7 @@ pub struct PassVerificationActionData {
     pub new_password_repeat_signal: RwSignal<String>,
     pub result: RwSignal<Option<ResultHandler<String>>>,
     pub action_type: PassVerificationAction,
+    pub pass_verification_map_signal: Signal<HashMap<String, GeneralFormField>>,
 }
 
 pub fn get_is_action_enabled_signal(

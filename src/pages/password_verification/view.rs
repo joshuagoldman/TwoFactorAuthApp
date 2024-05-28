@@ -29,13 +29,14 @@ pub fn PasswordVerification(
     let new_password_signal = create_rw_signal(String::new());
     let new_password_repeat_signal = create_rw_signal(String::new());
     let action_name = get_action_to_perform_title(is_verification_mode, action_type.clone());
-    let (_, error_fields_signal, login_fields_map_signal) = get_password_verification_form_signals(
-        current_password_signal,
-        new_password_signal,
-        new_password_repeat_signal,
-        action_type.clone(),
-        is_verification_mode,
-    );
+    let (_, error_fields_signal, pass_verification_map_signal) =
+        get_password_verification_form_signals(
+            current_password_signal,
+            new_password_signal,
+            new_password_repeat_signal,
+            action_type.clone(),
+            is_verification_mode,
+        );
 
     let pass_verification_data = PassVerificationActionData {
         current_password_signal,
@@ -46,8 +47,10 @@ pub fn PasswordVerification(
         result,
         is_loading,
         action_type: action_type.clone(),
+        pass_verification_map_signal,
     };
-    let action_to_perform = get_action_to_perform(pass_verification_data, action_type.clone());
+    let action_to_perform =
+        get_action_to_perform(pass_verification_data.clone(), action_type.clone());
 
     let any_error = Signal::derive(move || error_fields_signal.get().len() > 0);
 
@@ -88,7 +91,7 @@ pub fn PasswordVerification(
                                     }
                                 >
                                    <PasswordVerificationForm
-                                        login_fields_map_signal
+                                        pass_verification_data = pass_verification_data.clone()
                                         action_enabled
                                         action_name
                                         is_success
