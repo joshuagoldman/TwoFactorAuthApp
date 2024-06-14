@@ -10,7 +10,7 @@ use leptos::{
 use regex::Regex;
 
 use crate::{
-    api::{api_boundary::ResultHandler, OtpAuthorizedApi},
+    api::{api_boundary::ResultHandler, otp_authorized_api::OtpAuthorizedApi},
     components::{fields_error::TextFieldErrors, otp_field::OtpField},
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY},
     misc,

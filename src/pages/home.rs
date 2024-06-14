@@ -4,7 +4,7 @@ use async_std::task;
 use leptos::{component, create_action, view, IntoView, RwSignal, SignalGet, SignalUpdate};
 
 use crate::{
-    api::{api_boundary::ProfileInfo, AuthorizedApi},
+    api::{api_boundary::ProfileInfo, authorized_api::AuthorizedApi},
     misc,
 };
 

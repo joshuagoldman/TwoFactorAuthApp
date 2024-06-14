@@ -77,8 +77,7 @@ pub fn on_register_click(
             .clone();
         let new_user = NewUser {
             username,
-            first_name,
-            last_name,
+            full_name: format!("{} {}", first_name, last_name),
             email,
             password,
         };

@@ -3,7 +3,10 @@ use std::rc::Rc;
 use leptos::{create_rw_signal, view, IntoView, View};
 
 use crate::{
-    api::{self, AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi},
+    api::{
+        authorized_api::AuthorizedApi, otp_authorized_api::OtpAuthorizedApi,
+        unauthorized_api::UnauthorizedApi,
+    },
     misc::ApiStateViewInfo,
     pages::{
         self, home::Home, login::view::Login, otp::Otp,
@@ -12,7 +15,7 @@ use crate::{
 };
 
 pub fn get_unauth_view() -> Rc<impl Fn(UnauthorizedApi) -> View + 'static> {
-    let unauth_view_func = move |unauth_api: api::UnauthorizedApi| {
+    let unauth_view_func = move |unauth_api: UnauthorizedApi| {
         view! {
             <Login unauth_api
             />
@@ -23,7 +26,7 @@ pub fn get_unauth_view() -> Rc<impl Fn(UnauthorizedApi) -> View + 'static> {
 }
 
 pub fn get_login_view() -> ApiStateViewInfo<View> {
-    let unauth_view_func = move |unauth_api: api::UnauthorizedApi| {
+    let unauth_view_func = move |unauth_api: UnauthorizedApi| {
         view! {
             <Login unauth_api
             />
@@ -40,7 +43,7 @@ pub fn get_login_view() -> ApiStateViewInfo<View> {
 }
 
 pub fn get_register_view() -> ApiStateViewInfo<View> {
-    let register_view_func = move |unatuhorized_api: api::UnauthorizedApi| {
+    let register_view_func = move |unatuhorized_api: UnauthorizedApi| {
         view! {
             <Register unatuhorized_api
             />

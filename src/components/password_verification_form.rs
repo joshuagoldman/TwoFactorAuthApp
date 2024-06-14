@@ -1,11 +1,7 @@
-use std::collections::HashMap;
-
 use leptos::{component, view, Action, CollectView, IntoView, Show, Signal, SignalGet, View};
 
 use crate::{
     components::form_field::FormField,
-    consts::{CURRENT_PASSWORD_FIELD_STR, NEW_PASSWORD_FIELD_STR},
-    misc::GeneralFormField,
     pages::password_verification::misc::{is_allowed_field, PassVerificationActionData},
 };
 

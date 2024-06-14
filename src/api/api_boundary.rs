@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Credentials {
-    pub username: String,
     pub password: String,
+    pub username: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -24,16 +24,28 @@ pub struct User {
 pub struct NewUser {
     pub username: String,
     pub password: String,
-    pub first_name: String,
-    pub last_name: String,
+    pub full_name: String,
     pub email: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct NewUserResponse {
-    pub first_name: String,
-    pub last_name: String,
+    pub username: String,
+    pub email: String,
+    pub full_name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct CreateNewUserResponse {
+    pub user: NewUserResponse,
     pub qr_code: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UserResponse {
+    pub username: String,
+    pub email: String,
+    pub full_name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -50,6 +62,7 @@ pub struct ApiToken {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TokenResponse {
     pub token: String,
+    pub username: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -59,20 +72,13 @@ pub struct ResetPasswordRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ValidatePasswordRequest {
+pub struct PasswordRequest {
     pub password: String,
-    pub token: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OtpRequest {
     pub otp: TokenResponse,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct OtpSuccessResult {
-    pub token: TokenResponse,
-    pub profile_info: ProfileInfo,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

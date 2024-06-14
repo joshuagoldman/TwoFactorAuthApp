@@ -35,8 +35,6 @@ pub fn get_login_form_signals(
     Signal<Vec<String>>,
     Signal<HashMap<String, GeneralFormField>>,
 ) {
-    let login_form_fields = get_login_fields(user_name, password_field);
-
     let login_forms_signal = Signal::derive(move || {
         let login_form_fields = get_login_fields(user_name, password_field);
 

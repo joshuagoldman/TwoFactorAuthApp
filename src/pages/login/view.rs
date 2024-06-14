@@ -3,15 +3,15 @@ use std::time::Duration;
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_effect, create_rw_signal, leptos_dom::logging::console_log,
-    view, IntoView, RwSignal, Show, Signal, SignalGet, SignalUpdate, SignalWith,
+    component, create_action, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet,
+    SignalUpdate,
 };
 
 use crate::{
     api::{
         self,
         api_boundary::{ApiToken, Credentials},
-        UnauthorizedApi,
+        unauthorized_api::UnauthorizedApi,
     },
     components::{fields_error::TextFieldErrors, login_form::*},
     consts::API_TOKEN_OTP_KEY,
@@ -39,9 +39,6 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
         }
     });
 
-    let credentials_empty_signal =
-        Signal::derive(move || user_name.get().is_empty() && password_field.get().is_empty());
-
     let on_login = create_action(move |login_data: &Credentials| {
         let login_data = login_data.clone();
         async move {
@@ -49,12 +46,6 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
             task::sleep(Duration::from_secs(2)).await;
             match unauth_api.login(&login_data).await {
                 api::api_boundary::ResultHandler::OkResult(token_resp) => {
-                    //                   let auth_api = AuthorizedApi::new(
-                    //                       &DEFAULT_API_URL,
-                    //                       ApiToken {
-                    //                           token: token_resp.clone().token,
-                    //                       },
-                    //                   );
                     LocalStorage::set(
                         API_TOKEN_OTP_KEY.clone(),
                         ApiToken {

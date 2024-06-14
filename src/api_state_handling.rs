@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Duration};
+use std::time::Duration;
 
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
@@ -10,12 +10,15 @@ use log::info;
 
 use crate::{
     api::{
-        self,
         api_boundary::{ApiToken, ResultHandler},
-        AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi,
+        authorized_api::AuthorizedApi,
+        otp_authorized_api::OtpAuthorizedApi,
+        unauthorized_api::UnauthorizedApi,
     },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
-    misc::{go_to_page, is_move_to_default_page, ApiSignals, ApiState},
+    misc::{
+        go_to_page, is_move_to_default_page, ApiSignals, ApiState, ApiStateView, ApiStateViewInfo,
+    },
     pages::Page,
 };
 
@@ -35,7 +38,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
         .as_str(),
     );
     if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.clone()) {
-        let api = api::AuthorizedApi::new(&DEFAULT_API_URL, token);
+        let api = AuthorizedApi::new(&DEFAULT_API_URL, token);
         match api.has_expired().await {
             ResultHandler::OkResult(res) => {
                 if res {
@@ -57,7 +60,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
             }
         }
     } else if let Ok(token) = LocalStorage::get(API_TOKEN_OTP_KEY.clone()) {
-        let api = api::OtpAuthorizedApi::new(&DEFAULT_API_URL, token);
+        let api = OtpAuthorizedApi::new(&DEFAULT_API_URL, token);
         match api.has_expired().await {
             ResultHandler::OkResult(res) => {
                 if res {
@@ -78,7 +81,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
             }
         }
     } else {
-        let api = api::UnauthorizedApi::new(&DEFAULT_API_URL);
+        let api = UnauthorizedApi::new(&DEFAULT_API_URL);
         api_set_signals
             .unauth
             .update(|api_curr| *api_curr = Some(api));
@@ -89,31 +92,6 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
         }
     }
     api_set_signals.is_resolved.update(|x| *x = true);
-}
-
-#[derive(Clone)]
-pub struct ApiStateViewInfo<F>
-where
-    F: IntoView + 'static + Clone,
-{
-    pub page: Page,
-    pub view: ApiStateView<F>,
-}
-
-#[derive(Clone)]
-pub enum ApiStateView<F>
-where
-    F: IntoView + 'static + Clone,
-{
-    UnAuth(Rc<dyn Fn(UnauthorizedApi) -> F>),
-    OTPAuth(
-        Rc<dyn Fn(UnauthorizedApi) -> F>,
-        Rc<dyn Fn(OtpAuthorizedApi) -> F>,
-    ),
-    Auth(
-        Rc<dyn Fn(UnauthorizedApi) -> F>,
-        Rc<dyn Fn(AuthorizedApi) -> F>,
-    ),
 }
 
 #[component]

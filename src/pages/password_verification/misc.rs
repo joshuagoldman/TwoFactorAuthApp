@@ -6,7 +6,7 @@ use leptos::{Action, RwSignal, Signal, SignalGet, SignalUpdate};
 use leptos_router::use_navigate;
 
 use crate::{
-    api::{api_boundary::ResultHandler, AuthorizedApi},
+    api::{api_boundary::ResultHandler, authorized_api::AuthorizedApi},
     consts::{API_TOKEN_STORAGE_KEY, NEW_PASSWORD_FIELD_STR, REPEAT_NEW_PASSWORD_FIELD_STR},
     misc::GeneralFormField,
     pages::Page,

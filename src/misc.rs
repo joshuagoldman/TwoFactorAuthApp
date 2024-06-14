@@ -11,9 +11,10 @@ use log::info;
 
 use crate::{
     api::{
-        self,
         api_boundary::{ApiToken, ResultHandler},
-        AuthorizedApi, OtpAuthorizedApi, UnauthorizedApi,
+        authorized_api::AuthorizedApi,
+        otp_authorized_api::OtpAuthorizedApi,
+        unauthorized_api::UnauthorizedApi,
     },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
     pages::Page,
@@ -145,7 +146,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
         .as_str(),
     );
     if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.clone()) {
-        let api = api::AuthorizedApi::new(&DEFAULT_API_URL, token);
+        let api = AuthorizedApi::new(&DEFAULT_API_URL, token);
         match api.has_expired().await {
             ResultHandler::OkResult(res) => {
                 if res {
@@ -167,7 +168,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
             }
         }
     } else if let Ok(token) = LocalStorage::get(API_TOKEN_OTP_KEY.clone()) {
-        let api = api::OtpAuthorizedApi::new(&DEFAULT_API_URL, token);
+        let api = OtpAuthorizedApi::new(&DEFAULT_API_URL, token);
         match api.has_expired().await {
             ResultHandler::OkResult(res) => {
                 if res {
@@ -188,7 +189,7 @@ pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page
             }
         }
     } else {
-        let api = api::UnauthorizedApi::new(&DEFAULT_API_URL);
+        let api = UnauthorizedApi::new(&DEFAULT_API_URL);
         api_set_signals
             .unauth
             .update(|api_curr| *api_curr = Some(api));

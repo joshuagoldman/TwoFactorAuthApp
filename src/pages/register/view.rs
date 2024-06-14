@@ -3,8 +3,8 @@ use leptos::{
     SignalGet, SignalUpdate,
 };
 
-use crate::api::api_boundary::{NewUser, NewUserResponse, ResultHandler};
-use crate::api::UnauthorizedApi;
+use crate::api::api_boundary::{CreateNewUserResponse, NewUser, ResultHandler};
+use crate::api::unauthorized_api::UnauthorizedApi;
 use crate::components::fields_error::TextFieldErrors;
 use crate::components::form_field::AllRegisterFields;
 use crate::misc::GeneralFormField;
@@ -18,7 +18,7 @@ use std::time::Duration;
 #[component]
 pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     let registering = create_rw_signal(false);
-    let registering_succeded: RwSignal<Option<NewUserResponse>> = create_rw_signal(None);
+    let registering_succeded: RwSignal<Option<CreateNewUserResponse>> = create_rw_signal(None);
     let error_message: RwSignal<Option<String>> = create_rw_signal(None);
 
     let on_register = create_action(move |new_user: &NewUser| {
@@ -145,7 +145,7 @@ fn RegisterFields(
 }
 
 #[component]
-fn BarCode(new_user_info: NewUserResponse) -> impl IntoView {
+fn BarCode(new_user_info: CreateNewUserResponse) -> impl IntoView {
     view! {
         <div class="d-flex flex-row align-items-center mb-4">
             <div>
