@@ -14,6 +14,9 @@ where
     T: DeserializeOwned,
 {
     let res = response.text().await;
+    if !response.ok() {
+        return to_result_handler(res).pipe(|json_str| ResultHandler::ErrResult(json_str));
+    }
     to_result_handler(res).pipe_result_action(|json_str| serde_json::from_str(&json_str))
 }
 

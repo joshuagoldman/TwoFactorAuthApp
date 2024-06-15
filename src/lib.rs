@@ -1,20 +1,19 @@
+use api_state::api_state_view_infos::{
+    get_delete_view, get_home_view, get_login_view, get_otp_view, get_register_view,
+    get_reset_view, get_unauth_view,
+};
 use leptos::component;
 use leptos::*;
 use leptos_router::*;
+use misc::ApiStateCheckView;
 
 mod api;
-mod api_state_handling;
-mod api_state_view_infos;
+mod api_state;
 mod components;
 mod consts;
 mod misc;
 mod pages;
 
-use crate::api_state_view_infos::{
-    get_delete_view, get_home_view, get_login_view, get_otp_view, get_register_view,
-    get_reset_view, get_unauth_view,
-};
-use crate::misc::ApiStateCheckView;
 use crate::pages::page_not_found::PageNotFound;
 use crate::pages::Page;
 

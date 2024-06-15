@@ -68,7 +68,7 @@ impl AuthorizedApi {
             })
             .pipe_result_action_async(|ok_req| ok_req.send())
             .await
-            .pipe_action_async(|response| into_json::<()>(response))
+            .pipe_action_async(|response| into_json::<UserResponse>(response))
             .await
             .pipe_result_action(|_| {
                 std::result::Result::Ok(true) as std::result::Result<bool, String>

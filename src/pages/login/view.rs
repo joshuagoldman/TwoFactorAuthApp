@@ -3,8 +3,8 @@ use std::time::Duration;
 use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet,
-    SignalUpdate,
+    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, IntoView,
+    RwSignal, Show, Signal, SignalGet, SignalUpdate,
 };
 
 use crate::{
@@ -46,6 +46,7 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
             task::sleep(Duration::from_secs(2)).await;
             match unauth_api.login(&login_data).await {
                 ResultHandler::OkResult(token_resp) => {
+                    console_log(format!("{:>?}", token_resp).as_str());
                     LocalStorage::set(
                         API_TOKEN_OTP_KEY.clone(),
                         ApiToken {

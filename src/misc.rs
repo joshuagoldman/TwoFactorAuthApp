@@ -1,20 +1,17 @@
-use std::{collections::HashMap, rc::Rc, time::Duration};
+use std::{collections::HashMap, rc::Rc};
 
-use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{
-    component, create_action, create_rw_signal, leptos_dom::logging::console_log, view, IntoView,
-    RwSignal, Show, Signal, SignalGet, SignalUpdate,
+    component, create_action, create_rw_signal, view, IntoView, RwSignal, Show, Signal, SignalGet,
 };
 use leptos_router::use_navigate;
-use log::info;
 
 use crate::{
     api::{
-        api_boundary::ApiToken, authorized_api::AuthorizedApi,
-        otp_authorized_api::OtpAuthorizedApi, resulthandler::ResultHandler,
+        authorized_api::AuthorizedApi, otp_authorized_api::OtpAuthorizedApi,
         unauthorized_api::UnauthorizedApi,
     },
+    api_state::check_user_logged_in::check_user_logged_in,
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},
     pages::Page,
 };
@@ -127,78 +124,6 @@ pub fn is_move_to_default_page(page: Page, api_state: ApiState) -> Option<Page> 
     } else {
         Some(default_page)
     }
-}
-
-pub async fn check_user_logged_in(api_set_signals: ApiSignals, chosen_page: Page) {
-    console_log(
-        format!(
-            "{:>?}",
-            LocalStorage::get::<ApiToken>(API_TOKEN_OTP_KEY.clone())
-        )
-        .as_str(),
-    );
-    console_log(
-        format!(
-            "{:>?}",
-            LocalStorage::get::<ApiToken>(API_TOKEN_STORAGE_KEY.clone())
-        )
-        .as_str(),
-    );
-    if let Ok(token) = LocalStorage::get(API_TOKEN_STORAGE_KEY.clone()) {
-        let api = AuthorizedApi::new(&DEFAULT_API_URL, token);
-        match api.has_expired().await {
-            ResultHandler::OkResult(res) => {
-                if res {
-                    info!("login session token has expired");
-                } else {
-                    api_set_signals
-                        .auth
-                        .update(|api_curr| *api_curr = Some(api));
-                    if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::Auth)
-                    {
-                        task::sleep(Duration::from_secs(2)).await;
-                        go_to_page(defaut_page);
-                        return;
-                    }
-                }
-            }
-            ResultHandler::ErrResult(err_message) => {
-                info!("{}", err_message);
-            }
-        }
-    } else if let Ok(token) = LocalStorage::get(API_TOKEN_OTP_KEY.clone()) {
-        let api = OtpAuthorizedApi::new(&DEFAULT_API_URL, token);
-        match api.has_expired().await {
-            ResultHandler::OkResult(res) => {
-                if res {
-                    info!("Enter OTP session token has expired");
-                } else {
-                    api_set_signals
-                        .otpauth
-                        .update(|api_curr| *api_curr = Some(api));
-                    if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::Otp) {
-                        task::sleep(Duration::from_secs(2)).await;
-                        go_to_page(defaut_page);
-                        return;
-                    }
-                }
-            }
-            ResultHandler::ErrResult(err_message) => {
-                info!("{}", err_message);
-            }
-        }
-    } else {
-        let api = UnauthorizedApi::new(&DEFAULT_API_URL);
-        api_set_signals
-            .unauth
-            .update(|api_curr| *api_curr = Some(api));
-        if let Some(defaut_page) = is_move_to_default_page(chosen_page, ApiState::UnAuth) {
-            task::sleep(Duration::from_secs(2)).await;
-            go_to_page(defaut_page);
-            return;
-        }
-    }
-    api_set_signals.is_resolved.update(|x| *x = true);
 }
 
 #[derive(Clone)]

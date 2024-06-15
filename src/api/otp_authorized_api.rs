@@ -19,7 +19,7 @@ impl OtpAuthorizedApi {
 
     pub async fn check_otp(&self, otp: &String) -> ResultHandler<AuthorizedApi> {
         let url = format!("{}/verifyotp/{}", self.url, otp);
-        self.send::<TokenResponse>(Request::delete(&url))
+        self.send::<TokenResponse>(Request::get(&url))
             .await
             .pipe_result_action(|token_resp| {
                 std::result::Result::Ok(AuthorizedApi::new(
@@ -51,7 +51,7 @@ impl OtpAuthorizedApi {
 
     pub async fn has_expired(&self) -> ResultHandler<bool> {
         let url = format!("{}/expired", self.url);
-        self.send(Request::delete(&url)).await
+        self.send(Request::get(&url)).await
     }
 
     pub async fn check_connection(&self, req: RequestBuilder) -> ResultHandler<RequestBuilder> {
