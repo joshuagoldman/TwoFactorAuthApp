@@ -45,8 +45,9 @@ pub struct UserResponse {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProfileInfo {
-    pub name: String,
-    pub id: String,
+    pub username: String,
+    pub email: String,
+    pub fullname: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

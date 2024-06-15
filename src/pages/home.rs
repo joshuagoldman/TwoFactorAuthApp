@@ -33,7 +33,7 @@ pub fn Home(
                 match profile_info.get() {
                     Some(profile_info_some) => view! {
                         <div style="color:white;">{move || {
-                                format!("Welcome mynigga, {}", profile_info_some.name)
+                                format!("Welcome, {}", profile_info_some.fullname)
                             }}
                         </div>
                     },

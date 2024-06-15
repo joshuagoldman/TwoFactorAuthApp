@@ -28,15 +28,18 @@ impl AuthorizedApi {
     }
 
     pub async fn get_user_data(&self) -> ResultHandler<ProfileInfo> {
-        let url = format!("{}/profileInfo", self.url);
+        let url = format!("{}/user", self.url);
         let res = self.send(Request::get(&url)).await;
         res
     }
 
     pub async fn reset_password(&self, new_password: &String) -> ResultHandler<bool> {
-        let url = format!("{}/login", self.url);
+        let url = format!("{}/changepass", self.url);
         self.check_connection(Request::post(&url))
             .await
+            .pipe(|req_ok| {
+                ResultHandler::OkResult(req_ok.header("Authorization", &self.auth_header_value()))
+            })
             .pipe_result_action(|ok_req| {
                 ok_req.json(&PasswordRequest {
                     password: new_password.clone(),
@@ -55,6 +58,9 @@ impl AuthorizedApi {
         let url = format!("{}/verifypass", self.url);
         self.check_connection(Request::post(&url))
             .await
+            .pipe(|req_ok| {
+                ResultHandler::OkResult(req_ok.header("Authorization", &self.auth_header_value()))
+            })
             .pipe_result_action(|ok_req| {
                 ok_req.json(&PasswordRequest {
                     password: password.clone(),
@@ -71,11 +77,7 @@ impl AuthorizedApi {
 
     pub async fn delete_account(&self) -> ResultHandler<bool> {
         let res = self
-            .check_connection(Request::delete(&self.url))
-            .await
-            .pipe_result_action_async(|ok_req| ok_req.send())
-            .await
-            .pipe_action_async(|response| into_json::<UserResponse>(response))
+            .send::<UserResponse>(Request::delete(&self.url))
             .await
             .pipe_result_action(|_| {
                 std::result::Result::Ok(true) as std::result::Result<bool, String>
