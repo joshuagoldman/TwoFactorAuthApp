@@ -15,7 +15,7 @@ use crate::{
     },
     components::{fields_error::TextFieldErrors, login_form::*},
     consts::API_TOKEN_OTP_KEY,
-    misc,
+    misc::{self, go_to_page},
     pages::{login::functions::get_login_form_signals, Page},
 };
 
@@ -98,6 +98,11 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
                                     additional_form_action
                                   >
                                   </LoginForm>
+                                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                        <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                                                    on:click= {move |_| go_to_page(Page::Register)}
+                                        >Register</button>
+                                    </div>
                                 </Show>
                                 <TextFieldErrors error_fields_signal />
                                 <LoginError login_error_signal/>
