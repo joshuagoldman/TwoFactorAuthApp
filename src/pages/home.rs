@@ -4,7 +4,7 @@ use async_std::task;
 use leptos::{component, create_action, view, IntoView, RwSignal, SignalGet, SignalUpdate};
 
 use crate::{
-    api::{api_boundary::ProfileInfo, authorized_api::AuthorizedApi},
+    api::{api_boundary::ProfileInfo, authorized_api::AuthorizedApi, resulthandler::ResultHandler},
     misc,
 };
 
@@ -18,10 +18,10 @@ pub fn Home(
         async move {
             task::sleep(Duration::from_secs(1)).await;
             match authorized_api.get_user_data().await {
-                crate::api::api_boundary::ResultHandler::OkResult(user_data) => {
+                ResultHandler::OkResult(user_data) => {
                     profile_info.update(|x| *x = Some(user_data));
                 }
-                crate::api::api_boundary::ResultHandler::ErrResult(_) => todo!(),
+                ResultHandler::ErrResult(_) => todo!(),
             }
         }
     });

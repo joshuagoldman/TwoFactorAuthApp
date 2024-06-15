@@ -9,8 +9,8 @@ use leptos::{
 
 use crate::{
     api::{
-        self,
         api_boundary::{ApiToken, Credentials},
+        resulthandler::ResultHandler,
         unauthorized_api::UnauthorizedApi,
     },
     components::{fields_error::TextFieldErrors, login_form::*},
@@ -45,7 +45,7 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
             logging_in_signal.update(|upd: &mut bool| *upd = true);
             task::sleep(Duration::from_secs(2)).await;
             match unauth_api.login(&login_data).await {
-                api::api_boundary::ResultHandler::OkResult(token_resp) => {
+                ResultHandler::OkResult(token_resp) => {
                     LocalStorage::set(
                         API_TOKEN_OTP_KEY.clone(),
                         ApiToken {
@@ -55,7 +55,7 @@ pub fn Login(unauth_api: UnauthorizedApi) -> impl IntoView {
                     .unwrap();
                     misc::go_to_page(Page::OtpValidation)
                 }
-                api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                ResultHandler::ErrResult(err_msg) => {
                     login_error_signal.update(|x| *x = Some(err_msg));
                 }
             }

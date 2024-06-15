@@ -3,7 +3,8 @@ use leptos::{
     SignalGet, SignalUpdate,
 };
 
-use crate::api::api_boundary::{CreateNewUserResponse, NewUser, ResultHandler};
+use crate::api::api_boundary::{CreateNewUserResponse, NewUser};
+use crate::api::resulthandler::ResultHandler;
 use crate::api::unauthorized_api::UnauthorizedApi;
 use crate::components::fields_error::TextFieldErrors;
 use crate::components::form_field::AllRegisterFields;

@@ -4,7 +4,7 @@ use leptos::{
 };
 
 use crate::{
-    api::{api_boundary::ResultHandler, authorized_api::AuthorizedApi},
+    api::{authorized_api::AuthorizedApi, resulthandler::ResultHandler},
     components::{
         fields_error::TextFieldErrors, password_verification_form::PasswordVerificationForm,
     },

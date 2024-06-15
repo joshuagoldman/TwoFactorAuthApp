@@ -10,9 +10,8 @@ use log::info;
 
 use crate::{
     api::{
-        api_boundary::{ApiToken, ResultHandler},
-        authorized_api::AuthorizedApi,
-        otp_authorized_api::OtpAuthorizedApi,
+        api_boundary::ApiToken, authorized_api::AuthorizedApi,
+        otp_authorized_api::OtpAuthorizedApi, resulthandler::ResultHandler,
         unauthorized_api::UnauthorizedApi,
     },
     consts::{API_TOKEN_OTP_KEY, API_TOKEN_STORAGE_KEY, DEFAULT_API_URL},

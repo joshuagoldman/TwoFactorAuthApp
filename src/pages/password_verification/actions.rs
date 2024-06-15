@@ -4,10 +4,7 @@ use async_std::task;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::{create_action, Action, SignalUpdate};
 
-use crate::{
-    api::{self, api_boundary::ResultHandler},
-    consts::API_TOKEN_STORAGE_KEY,
-};
+use crate::{api::resulthandler::ResultHandler, consts::API_TOKEN_STORAGE_KEY};
 
 use super::misc::{
     ok_result_handle, set_signal_state_to_init, verify_password_ok_handle,
@@ -33,16 +30,16 @@ pub fn get_verify_password_action(
                 .validate_password(&current_password)
                 .await
             {
-                api::api_boundary::ResultHandler::OkResult(true) => {
+                ResultHandler::OkResult(true) => {
                     verify_password_ok_handle(pass_ver_data);
                 }
-                api::api_boundary::ResultHandler::OkResult(false) => {
+                ResultHandler::OkResult(false) => {
                     pass_ver_data.result.update(|x| {
                         *x = Some(ResultHandler::ErrResult("Verification Failed".to_string()))
                     });
                     set_signal_state_to_init(pass_ver_data);
                 }
-                api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                ResultHandler::ErrResult(err_msg) => {
                     pass_ver_data
                         .result
                         .update(|x| *x = Some(ResultHandler::ErrResult(err_msg)));
@@ -70,10 +67,10 @@ pub fn reset_action(
             task::sleep(Duration::from_secs(2)).await;
 
             match authorized_api.reset_password(&new_password).await {
-                api::api_boundary::ResultHandler::OkResult(_) => {
+                ResultHandler::OkResult(_) => {
                     ok_result_handle(pass_ver_data).await;
                 }
-                api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                ResultHandler::ErrResult(err_msg) => {
                     pass_ver_data
                         .result
                         .update(|x| *x = Some(ResultHandler::ErrResult(err_msg)));
@@ -98,10 +95,10 @@ pub fn delete_account_action(pass_ver_data: PassVerificationActionData) -> Actio
             task::sleep(Duration::from_secs(2)).await;
 
             match authorized_api.delete_account().await {
-                api::api_boundary::ResultHandler::OkResult(_) => {
+                ResultHandler::OkResult(_) => {
                     ok_result_handle(pass_ver_data).await;
                 }
-                api::api_boundary::ResultHandler::ErrResult(err_msg) => {
+                ResultHandler::ErrResult(err_msg) => {
                     pass_ver_data
                         .result
                         .update(|x| *x = Some(ResultHandler::ErrResult(err_msg)));

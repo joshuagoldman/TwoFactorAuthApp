@@ -1,8 +1,10 @@
 use gloo_net::http::{Request, RequestBuilder, Response};
+use resulthandler::{to_result_handler, ResultHandler};
 use serde::de::DeserializeOwned;
 pub mod api_boundary;
 pub mod authorized_api;
 pub mod otp_authorized_api;
+pub mod resulthandler;
 pub mod unauthorized_api;
 
 use api_boundary::*;
