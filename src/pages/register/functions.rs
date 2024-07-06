@@ -1,6 +1,7 @@
 use std::{collections::HashMap, rc::Rc};
 
 use leptos::{create_rw_signal, Action, RwSignal, Signal, SignalGet};
+use regex::Regex;
 
 use crate::{
     api::api_boundary::NewUser,
@@ -99,39 +100,48 @@ pub fn get_register_form_fields(
             requirement: None,
             is_password: false,
             signal: user_name,
+            icon: "fas fa-address-card".to_string(),
         },
         GeneralFormField {
             name: FIRST_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: first_name,
+            icon: "fas fa-star".to_string(),
         },
         GeneralFormField {
             name: LAST_NAME_FIELD_STR.clone(),
             requirement: None,
             is_password: false,
             signal: last_name,
+            icon: "fas fa-star".to_string(),
         },
         GeneralFormField {
             name: EMAIL_FIELD_STR.clone(),
             requirement: Some(Requirement {
-                func: Rc::new(move |str_val| return str_val == &"joshuagoldman94@gmail.com"),
+                func: Rc::new(move |str_val| {
+                    let re = Regex::new(r"^([a-z0-9_+]([a-z0-9_+.]*[a-z0-9_+])?)@([a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6})").unwrap();
+                    return re.is_match(str_val);
+                }),
                 fail_msg: "Email not valid".to_string(),
             }),
             is_password: false,
             signal: email,
+            icon: "fas fa-envelope-open".to_string(),
         },
         GeneralFormField {
             name: PASSWORD_FIELD_STR.clone(),
             requirement: None,
             is_password: true,
             signal: password_field,
+            icon: "fas fa-key".to_string(),
         },
         GeneralFormField {
             name: REPEAT_PASSWORD_FIELD_STR.to_string(),
             requirement: None,
             is_password: true,
             signal: password_field_repeat,
+            icon: "fas fa-key".to_string(),
         },
     ]
 }

@@ -17,12 +17,14 @@ fn get_login_fields(
             requirement: None,
             is_password: false,
             signal: user_name,
+            icon: "fas fa-address-card".to_string(),
         },
         GeneralFormField {
             name: PASSWORD_FIELD_STR.clone(),
             requirement: None,
             is_password: true,
             signal: password_field,
+            icon: "fas fa-key".to_string(),
         },
     ]
 }

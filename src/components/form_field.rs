@@ -151,8 +151,8 @@ pub fn FormField(
 
     view! {
         <div class="d-flex flex-row align-items-center">
-            <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+            <i class= {move || format!("{} fa-lg", form_field.icon)}></i>
+            <div data-mdb-input-init class="form-outline flex-fill mb-0 mt-4 ml-2">
                 <input type={form_type} class="form-control"
                         style={move || style.get()}
                         on:keyup = move |ev: ev::KeyboardEvent| {

@@ -49,6 +49,7 @@ pub struct GeneralFormField {
     pub requirement: Option<Requirement>,
     pub is_password: bool,
     pub signal: RwSignal<String>,
+    pub icon: String,
 }
 
 #[derive(Clone, Copy)]
