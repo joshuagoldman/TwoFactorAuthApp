@@ -25,14 +25,14 @@ fn get_password_verification_fields(
         GeneralFormField {
             name: NEW_PASSWORD_FIELD_STR.clone(),
             requirement: None,
-            is_password: false,
+            is_password: true,
             signal: new_password_signal,
             icon: "fas fa-key".to_string(),
         },
         GeneralFormField {
             name: REPEAT_NEW_PASSWORD_FIELD_STR.clone(),
             requirement: None,
-            is_password: false,
+            is_password: true,
             signal: new_password_repeat_signal,
             icon: "fas fa-key".to_string(),
         },

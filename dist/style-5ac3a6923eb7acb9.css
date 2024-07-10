@@ -37,13 +37,6 @@ font-family: 'Numans', sans-serif;
 	box-shadow: rgba(0, 0, 0, 0.3) 20px 20px 20px;
 }
 
-.otp-field {
-  flex-direction: row;
-  column-gap: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .resend {
   font-size: 12px;
@@ -62,4 +55,28 @@ font-family: 'Numans', sans-serif;
 .footer a {
   color: black;
   text-decoration: none;
+}
+
+.otp-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 3px;
+  padding:5px;
+  text-align: center;
+  grid-auto-flow: dense;
+}
+
+.otp-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 40px);
+  gap: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  grid-auto-flow: dense;
+}
+
+.center-cntnt {
+  display: grid;
+  width: min-content;
+  margin: auto;
 }

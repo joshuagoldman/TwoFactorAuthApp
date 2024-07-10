@@ -127,52 +127,46 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
     });
 
     view! {
-        <div class="blurry-card">
-            <Show
-                when= {move || !is_verifying_otp.get()}
-                fallback= {move || view! {<div style="color:white">{"Verifying OTP..."}</div>}}
-            >
-                <section class="container-fluid bg-body-tertiary d-block">
+
+        <div class="container">
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="blurry-card" style="height:100%">
                     <div class="row justify-content-center">
-                        <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px;">
-                            <div class="card bg-white mb-5 mt-5 border-0" style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.02);">
-                            <div class="card-body p-5 text-center">
-                                <h4>{"Verify"}</h4>
-                                <p>{"Check your code on qr-code app..."}</p>
-
-
-                            <form class="mx-1 mx-md-4">
-                                <div class="otp-field mb-1">
-                                    <OtpField otp_field_val=otp_num_1_signal additional_form_action></OtpField>
-                                    <OtpField otp_field_val=otp_num_2_signal additional_form_action></OtpField>
-                                    <OtpField otp_field_val=otp_num_3_signal additional_form_action></OtpField>
-                                    <OtpField otp_field_val=otp_num_4_signal additional_form_action></OtpField>
-                                    <OtpField otp_field_val=otp_num_5_signal additional_form_action></OtpField>
-                                    <OtpField otp_field_val=otp_num_6_signal additional_form_action></OtpField>
-                                </div>
-
-                                <button class="btn btn-primary mb-3"
-                                        disabled= {move || !all_otp_entered.get()}
-                                        on:click= {move |_| {
-                                            on_verify_otp.dispatch(otp_signal_derived.get())
-                                        }}
-                                >
-                                    {"Verify"}
-                                </button>
-                                <OtpError
-                                   err_msg
-                                   fields_empty_signal
-                                ></OtpError>
-                                <TextFieldErrors
-                                    error_fields_signal
-                                ></TextFieldErrors>
-                            </form>
-                            </div>
-                            </div>
-                        </div>
+                            <Show
+                                when= {move || !is_verifying_otp.get()}
+                                fallback= {move || view! {<div style="color:white">{"Verifying OTP..."}</div>}}
+                            >
+                                <form class="otp-grid">
+                                    <h4>{"Verify"}</h4>
+                                    <p>{"Check your code on qr-code app..."}</p>
+                                    <div class="otp-fields">
+                                        <OtpField otp_field_val=otp_num_1_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_2_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_3_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_4_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_5_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_6_signal additional_form_action></OtpField>
+                                    </div>
+                                    <button class="btn btn-primary mb-3 mt-3 center-cntnt"
+                                            disabled= {move || !all_otp_entered.get()}
+                                            on:click= {move |_| {
+                                                on_verify_otp.dispatch(otp_signal_derived.get())
+                                            }}
+                                    >
+                                        {"Verify"}
+                                    </button>
+                                    <OtpError
+                                        err_msg
+                                        fields_empty_signal
+                                    ></OtpError>
+                                    <TextFieldErrors
+                                        error_fields_signal
+                                    ></TextFieldErrors>
+                                </form>
+                            </Show>
                     </div>
-                </section>
-            </Show>
+                </div>
+            </div>
         </div>
     }
 }

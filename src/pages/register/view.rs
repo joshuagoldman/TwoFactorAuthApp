@@ -1,3 +1,4 @@
+use gloo_storage::{LocalStorage, Storage};
 use leptos::{
     component, create_action, create_rw_signal, view, Action, IntoView, RwSignal, Show, Signal,
     SignalGet, SignalUpdate,
@@ -8,6 +9,7 @@ use crate::api::resulthandler::ResultHandler;
 use crate::api::unauthorized_api::UnauthorizedApi;
 use crate::components::fields_error::TextFieldErrors;
 use crate::components::form_field::AllRegisterFields;
+use crate::consts::API_TOKEN_STORAGE_KEY;
 use crate::misc::GeneralFormField;
 use crate::pages::register::functions::{
     all_reqs_fulfilled_func, get_form_fields_signals, on_register_click,
@@ -33,6 +35,7 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
                 ResultHandler::OkResult(ok_res) => {
                     registering.update(|x| *x = false);
                     registering_succeded.update(|x| *x = Some(ok_res));
+                    LocalStorage::delete(API_TOKEN_STORAGE_KEY.clone());
                 }
                 ResultHandler::ErrResult(err_msg) => {
                     registering.update(|x| *x = false);
@@ -62,7 +65,7 @@ pub fn Register(unatuhorized_api: UnauthorizedApi) -> impl IntoView {
     view! {
         <div class="container">
             <div class="row d-flex justify-content-center align-items-center">
-                <div class="blurry-card" style={move || format!("height:100%")}>
+                <div class="blurry-card" style="height:100%">
                     <div class="row justify-content-center">
                         <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
