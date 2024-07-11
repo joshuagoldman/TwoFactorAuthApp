@@ -147,14 +147,16 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
                                         <OtpField otp_field_val=otp_num_5_signal additional_form_action></OtpField>
                                         <OtpField otp_field_val=otp_num_6_signal additional_form_action></OtpField>
                                     </div>
-                                    <button class="btn btn-primary mb-3 mt-3 center-cntnt"
-                                            disabled= {move || !all_otp_entered.get()}
-                                            on:click= {move |_| {
-                                                on_verify_otp.dispatch(otp_signal_derived.get())
-                                            }}
-                                    >
-                                        {"Verify"}
-                                    </button>
+                                    <div>
+                                        <button class="btn btn-primary mb-3 mt-3"
+                                                disabled= {move || !all_otp_entered.get()}
+                                                on:click= {move |_| {
+                                                    on_verify_otp.dispatch(otp_signal_derived.get())
+                                                }}
+                                        >
+                                            {"Verify"}
+                                        </button>
+                                    </div>
                                     <OtpError
                                         err_msg
                                         fields_empty_signal

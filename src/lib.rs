@@ -1,15 +1,11 @@
-use api::api_boundary::ApiToken;
-use api::otp_authorized_api::OtpAuthorizedApi;
 use api_state::api_state_view_infos::{
     get_delete_view, get_home_view, get_login_view, get_otp_view, get_register_view,
     get_reset_view, get_unauth_view,
 };
-use consts::DEFAULT_API_URL;
 use leptos::component;
 use leptos::*;
 use leptos_router::*;
 use misc::ApiStateCheckView;
-use pages::otp;
 
 mod api;
 mod api_state;
@@ -31,24 +27,10 @@ pub fn App() -> impl IntoView {
     let reset_view_info = get_reset_view(unauth_view_func.clone());
     let delete_view_info = get_delete_view(unauth_view_func.clone());
 
-    let otp_tst_view = OtpAuthorizedApi::new(
-        &DEFAULT_API_URL,
-        ApiToken {
-            token: "ss".to_string(),
-        },
-    );
-
     view! {
         <Router>
             <main>
                 <Routes>
-                  <Route
-                        path="test"
-                        view= move || view! {
-                        <otp::Otp otp_auth_api=otp_tst_view.clone()/>
-                    }
-
-                  />
                   <Route
                         path=Page::Reset.path().to_string().clone()
                         view= move || view! {

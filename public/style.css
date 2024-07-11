@@ -59,20 +59,22 @@ font-family: 'Numans', sans-serif;
 
 .otp-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(5, min-content);
   gap: 3px;
   padding:5px;
   text-align: center;
-  grid-auto-flow: dense;
 }
 
 .otp-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 40px);
-  gap: 10px;
-  padding-left: 30px;
-  padding-right: 30px;
-  grid-auto-flow: dense;
+  grid-template-columns: repeat(auto-fit, 35px);
+  padding-left: 5px;
+  padding-right: 5px;
+  gap: 6px;
+}
+
+.btn {
+  max-width: min-content
 }
 
 .center-cntnt {

@@ -76,8 +76,9 @@ impl AuthorizedApi {
     }
 
     pub async fn delete_account(&self) -> ResultHandler<bool> {
+        let url = format!("{}/delete", self.url);
         let res = self
-            .send::<UserResponse>(Request::delete(&self.url))
+            .send::<UserResponse>(Request::delete(&url))
             .await
             .pipe_result_action(|_| {
                 std::result::Result::Ok(true) as std::result::Result<bool, String>

@@ -45,8 +45,10 @@ where
                 if let Some(authApi) = api_signals.auth.get() {
                     view_func_auth(authApi)
                 } else if let Some(unauth_api) = api_signals.unauth.get() {
+                    go_to_page(crate::pages::Page::Login);
                     view_func_unauth(unauth_api)
                 } else {
+                    go_to_page(crate::pages::Page::Login);
                     let unauth_api = UnauthorizedApi::new(&DEFAULT_API_URL);
                     view_func_unauth(unauth_api)
                 }
