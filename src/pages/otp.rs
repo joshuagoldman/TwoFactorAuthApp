@@ -140,12 +140,12 @@ pub fn Otp(otp_auth_api: OtpAuthorizedApi) -> impl IntoView {
                                     <h4>{"Verify"}</h4>
                                     <p>{"Check your code on qr-code app..."}</p>
                                     <div class="otp-fields">
-                                        <OtpField otp_field_val=otp_num_1_signal additional_form_action></OtpField>
-                                        <OtpField otp_field_val=otp_num_2_signal additional_form_action></OtpField>
-                                        <OtpField otp_field_val=otp_num_3_signal additional_form_action></OtpField>
-                                        <OtpField otp_field_val=otp_num_4_signal additional_form_action></OtpField>
-                                        <OtpField otp_field_val=otp_num_5_signal additional_form_action></OtpField>
-                                        <OtpField otp_field_val=otp_num_6_signal additional_form_action></OtpField>
+                                        <OtpField otp_field_val=otp_num_1_signal additional_form_action otp_field_num=1></OtpField>
+                                        <OtpField otp_field_val=otp_num_2_signal additional_form_action otp_field_num=2></OtpField>
+                                        <OtpField otp_field_val=otp_num_3_signal additional_form_action otp_field_num=3></OtpField>
+                                        <OtpField otp_field_val=otp_num_4_signal additional_form_action otp_field_num=4></OtpField>
+                                        <OtpField otp_field_val=otp_num_5_signal additional_form_action otp_field_num=5></OtpField>
+                                        <OtpField otp_field_val=otp_num_6_signal additional_form_action otp_field_num=6></OtpField>
                                     </div>
                                     <div>
                                         <button class="btn btn-primary mb-3 mt-3"
